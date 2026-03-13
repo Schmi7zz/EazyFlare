@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cloudflare Dashboard</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════ CLOUDFLARE DESIGN SYSTEM ═══════════════ */
+:root {
+  --cf-blue-900: #0a1628;
+  --cf-blue-800: #0d2137;
+  --cf-blue-700: #003681;
+  --cf-blue-600: #0051a3;
+  --cf-blue-500: #1166c5;
+  --cf-blue-400: #4693e8;
+  --cf-blue-100: #e0ecfc;
+  --cf-blue-50: #f0f6ff;
+  --cf-orange: #f6821f;
+  --cf-orange-hover: #e5750e;
+  --cf-orange-soft: #fff5eb;
+  --cf-green: #2fa85d;
+  --cf-green-soft: #eefaf3;
+  --cf-red: #d63e3e;
+  --cf-red-soft: #fcedee;
+  --cf-yellow: #e4a11b;
+  --cf-yellow-soft: #fef9ec;
+  --cf-gray-900: #1a1a1a;
+  --cf-gray-800: #2c2c2c;
+  --cf-gray-700: #404040;
+  --cf-gray-600: #555;
+  --cf-gray-500: #737373;
+  --cf-gray-400: #a0a0a0;
+  --cf-gray-300: #c5c5c5;
+  --cf-gray-200: #e5e5e5;
+  --cf-gray-100: #f3f3f3;
+  --cf-gray-50: #fafafa;
+  --cf-white: #ffffff;
+  --cf-shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+  --cf-shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+  --cf-shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
+  --cf-radius: 8px;
+  --cf-radius-lg: 12px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--cf-gray-100);
+  color: var(--cf-gray-900);
+  -webkit-tap-highlight-color: transparent;
+  min-height: 100vh;
+}
+
+/* ═══════════ TOP BAR ═══════════ */
+.topbar {
+  background: var(--cf-blue-900);
+  padding: 0 16px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar-logo {
+  width: 28px; height: 28px;
+}
+
+.topbar-logo svg {
+  width: 100%; height: 100%;
+}
+
+.topbar-title {
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-btn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: rgba(255,255,255,0.8);
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.topbar-btn:hover {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+.topbar-btn svg { width: 18px; height: 18px; }
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255,255,255,0.8);
+  font-size: 12px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.08);
+}
+
+.topbar-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--cf-orange), #e27625);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: white;
+}
+
+/* ═══════════ NAV TABS ═══════════ */
+.nav-tabs {
+  background: var(--cf-white);
+  border-bottom: 1px solid var(--cf-gray-200);
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+
+.nav-tab {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cf-gray-500);
+  border: none;
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  font-family: 'Vazirmatn', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav-tab:hover {
+  color: var(--cf-gray-700);
+}
+.nav-tab.active {
+  color: var(--cf-blue-600);
+  border-bottom-color: var(--cf-blue-600);
+  font-weight: 600;
+}
+.nav-tab svg {
+  width: 16px; height: 16px;
+}
+
+.nav-badge {
+  font-size: 10px;
+  background: var(--cf-blue-100);
+  color: var(--cf-blue-700);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+/* ═══════════ CONTENT ═══════════ */
+.content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* ═══════════ CARDS ═══════════ */
+.card {
+  background: var(--cf-white);
+  border: 1px solid var(--cf-gray-200);
+  border-radius: var(--cf-radius-lg);
+  box-shadow: var(--cf-shadow-sm);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--cf-gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cf-gray-900);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title svg { width: 18px; height: 18px; color: var(--cf-blue-600); }
+
+.card-body {
+  padding: 20px;
+}
+
+.card-body.compact {
+  padding: 0;
+}
+
+/* ═══════════ LOGIN SCREEN ═══════════ */
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(180deg, var(--cf-blue-900) 0%, var(--cf-blue-800) 40%, var(--cf-gray-100) 40%);
+}
+
+.login-card {
+  background: var(--cf-white);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  width: 100%;
+  max-width: 400px;
+  padding: 32px 28px;
+  position: relative;
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-logo svg {
+  width: 48px;
+  height: 48px;
+}
+
+.login-logo h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--cf-gray-900);
+  margin-top: 12px;
+}
+
+.login-logo p {
+  font-size: 13px;
+  color: var(--cf-gray-500);
+  margin-top: 4px;
+}
+
+/* ═══════════ FORM ELEMENTS ═══════════ */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cf-gray-700);
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--cf-gray-300);
+  border-radius: var(--cf-radius);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 14px;
+  color: var(--cf-gray-900);
+  background: var(--cf-white);
+  outline: none;
+  transition: all 0.15s;
+  direction: ltr;
+  text-align: left;
+}
+.form-input:focus {
+  border-color: var(--cf-blue-500);
+  box-shadow: 0 0 0 3px rgba(17,102,197,0.15);
+}
+.form-input::placeholder {
+  color: var(--cf-gray-400);
+}
+
+.form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--cf-gray-300);
+  border-radius: var(--cf-radius);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 14px;
+  color: var(--cf-gray-900);
+  background: var(--cf-white);
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 12px center;
+  padding-left: 32px;
+}
+.form-select:focus {
+  border-color: var(--cf-blue-500);
+  box-shadow: 0 0 0 3px rgba(17,102,197,0.15);
+}
+
+.form-hint {
+  font-size: 11px;
+  color: var(--cf-gray-500);
+  margin-top: 4px;
+}
+
+.form-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.toggle-track {
+  width: 40px;
+  height: 22px;
+  background: var(--cf-gray-300);
+  border-radius: 11px;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle-track.on {
+  background: var(--cf-orange);
+}
+
+.toggle-handle {
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  transition: right 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-track.on .toggle-handle {
+  right: 20px;
+}
+
+.toggle-label {
+  font-size: 13px;
+  color: var(--cf-gray-700);
+}
+
+/* ═══════════ BUTTONS ═══════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--cf-radius);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.btn svg { width: 16px; height: 16px; }
+
+.btn-primary {
+  background: var(--cf-blue-600);
+  color: white;
+}
+.btn-primary:hover {
+  background: var(--cf-blue-700);
+  box-shadow: 0 2px 8px rgba(0,54,129,0.25);
+}
+
+.btn-orange {
+  background: var(--cf-orange);
+  color: white;
+}
+.btn-orange:hover {
+  background: var(--cf-orange-hover);
+  box-shadow: 0 2px 8px rgba(246,130,31,0.3);
+}
+
+.btn-outline {
+  background: var(--cf-white);
+  color: var(--cf-gray-700);
+  border: 1px solid var(--cf-gray-300);
+}
+.btn-outline:hover {
+  background: var(--cf-gray-50);
+  border-color: var(--cf-gray-400);
+}
+
+.btn-danger {
+  background: var(--cf-red);
+  color: white;
+}
+.btn-danger:hover {
+  background: #c53030;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--cf-blue-600);
+  border: none;
+  padding: 6px 10px;
+}
+.btn-ghost:hover {
+  background: var(--cf-blue-50);
+}
+
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 12px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+/* ═══════════ TABLE ═══════════ */
+.dns-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dns-table thead th {
+  padding: 10px 16px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cf-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: var(--cf-gray-50);
+  border-bottom: 1px solid var(--cf-gray-200);
+}
+.dns-table thead th.ltr {
+  text-align: left;
+}
+
+.dns-table tbody tr {
+  border-bottom: 1px solid var(--cf-gray-100);
+  transition: background 0.1s;
+}
+.dns-table tbody tr:hover {
+  background: var(--cf-blue-50);
+}
+.dns-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.dns-table tbody td {
+  padding: 12px 16px;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.dns-table .ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+.type-badge.A     { background: #e0ecfc; color: #003681; }
+.type-badge.AAAA  { background: #ede9fe; color: #5b21b6; }
+.type-badge.CNAME { background: #eefaf3; color: #166534; }
+.type-badge.MX    { background: #fef9ec; color: #92400e; }
+.type-badge.TXT   { background: #fce7f3; color: #9d174d; }
+.type-badge.NS    { background: #e0f2fe; color: #075985; }
+.type-badge.SRV   { background: #fff7ed; color: #9a3412; }
+.type-badge.CAA   { background: #f3e8ff; color: #6b21a8; }
+
+.proxy-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+.proxy-icon.on  { color: var(--cf-orange); }
+.proxy-icon.off { color: var(--cf-gray-400); }
+.proxy-icon svg { width: 16px; height: 16px; }
+
+.name-cell {
+  font-weight: 600;
+  color: var(--cf-gray-900);
+  word-break: break-all;
+  font-family: 'SF Mono', 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.content-cell {
+  color: var(--cf-gray-600);
+  word-break: break-all;
+  font-family: 'SF Mono', 'Courier New', monospace;
+  font-size: 12px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ttl-cell {
+  font-size: 12px;
+  color: var(--cf-gray-500);
+}
+
+.actions-cell {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-start;
+}
+
+.action-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid var(--cf-gray-200);
+  background: white;
+  color: var(--cf-gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.action-btn svg { width: 14px; height: 14px; }
+.action-btn:hover {
+  background: var(--cf-gray-50);
+  color: var(--cf-gray-700);
+  border-color: var(--cf-gray-300);
+}
+.action-btn.danger:hover {
+  background: var(--cf-red-soft);
+  color: var(--cf-red);
+  border-color: var(--cf-red);
+}
+
+/* ═══════════ STATUS BADGES ═══════════ */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+.status.active   { background: var(--cf-green-soft); color: var(--cf-green); }
+.status.pending  { background: var(--cf-yellow-soft); color: var(--cf-yellow); }
+.status.inactive { background: var(--cf-red-soft); color: var(--cf-red); }
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ═══════════ ZONE SELECTOR ═══════════ */
+.zone-selector {
+  background: var(--cf-white);
+  border-bottom: 1px solid var(--cf-gray-200);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.zone-select-dropdown {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--cf-gray-300);
+  border-radius: var(--cf-radius);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--cf-white);
+  color: var(--cf-gray-900);
+  cursor: pointer;
+  outline: none;
+  direction: ltr;
+}
+.zone-select-dropdown:focus {
+  border-color: var(--cf-blue-500);
+}
+
+/* ═══════════ MODAL ═══════════ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-backdrop.open {
+  display: flex;
+}
+
+.modal-sheet {
+  background: var(--cf-white);
+  border-radius: 16px 16px 0 0;
+  width: 100%;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px 20px;
+  animation: sheetUp 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--cf-gray-300);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+
+.modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ═══════════ TOAST ═══════════ */
+.toast {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  padding: 10px 20px;
+  border-radius: var(--cf-radius);
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 200;
+  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+  box-shadow: var(--cf-shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Vazirmatn', sans-serif;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { background: var(--cf-green); color: white; }
+.toast.error   { background: var(--cf-red); color: white; }
+.toast.info    { background: var(--cf-blue-600); color: white; }
+
+/* ═══════════ LOADING ═══════════ */
+.loading-bar {
+  height: 3px;
+  background: var(--cf-gray-200);
+  position: relative;
+  overflow: hidden;
+}
+.loading-bar::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -40%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--cf-orange), transparent);
+  animation: loadSlide 1.2s infinite;
+}
+@keyframes loadSlide {
+  0% { left: -40%; }
+  100% { left: 100%; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--cf-gray-100) 25%, var(--cf-gray-200) 50%, var(--cf-gray-100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════════ EMPTY STATE ═══════════ */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+.empty-state svg {
+  width: 56px; height: 56px;
+  color: var(--cf-gray-300);
+  margin-bottom: 16px;
+}
+.empty-state h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cf-gray-700);
+  margin-bottom: 4px;
+}
+.empty-state p {
+  font-size: 13px;
+  color: var(--cf-gray-500);
+  margin-bottom: 16px;
+}
+
+/* ═══════════ RESPONSIVE ═══════════ */
+@media (max-width: 600px) {
+  .dns-table thead { display: none; }
+  .dns-table tbody tr {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    gap: 6px;
+    align-items: center;
+  }
+  .dns-table tbody td {
+    padding: 0;
+    border: none;
+  }
+  .dns-table tbody td:nth-child(1) { order: 1; }
+  .dns-table tbody td:nth-child(2) { order: 2; flex: 1; }
+  .dns-table tbody td:nth-child(3) { order: 4; width: 100%; }
+  .dns-table tbody td:nth-child(4) { order: 5; }
+  .dns-table tbody td:nth-child(5) { order: 3; }
+  .dns-table tbody td:nth-child(6) { order: 6; margin-right: auto; }
+  .content-cell { max-width: none; white-space: normal; }
+}
+
+/* Tab switch anim */
+.view { display: none; animation: viewIn 0.25s ease; }
+.view.active { display: block; }
+@keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Misc */
+.mt-8  { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mb-16 { margin-bottom: 16px; }
+.flex   { display: flex; }
+.gap-8  { gap: 8px; }
+.gap-12 { gap: 12px; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.text-sm { font-size: 13px; }
+.text-xs { font-size: 11px; }
+.text-dim { color: var(--cf-gray-500); }
+.text-mono { font-family: 'SF Mono','Courier New',monospace; font-size: 12px; direction: ltr; text-align: left; }
+.fw-600 { font-weight: 600; }
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--cf-gray-100);
+  font-size: 13px;
+}
+.info-row:last-child { border-bottom: none; }
+.info-label { color: var(--cf-gray-500); font-weight: 500; }
+.info-value { color: var(--cf-gray-900); font-weight: 600; direction: ltr; }
+
+.filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.filter-pill {
+  padding: 4px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--cf-gray-300);
+  background: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Vazirmatn', sans-serif;
+  transition: all 0.15s;
+  color: var(--cf-gray-600);
+}
+.filter-pill:hover { border-color: var(--cf-blue-500); color: var(--cf-blue-600); }
+.filter-pill.active {
+  background: var(--cf-blue-600);
+  color: white;
+  border-color: var(--cf-blue-600);
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOGIN SCREEN ═══════════ -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="64" height="64" rx="16" fill="#0a1628"/>
+        <path d="M44.5 35.2c.2-.7.1-1.4-.3-1.9-.4-.4-.9-.7-1.5-.7l-18.1-.2c-.1 0-.2-.1-.3-.2-.1-.1 0-.2 0-.3.1-.2.3-.4.5-.4l18.3-.2c2.5-.1 5.2-2.1 6.3-4.5l1.4-3.1c.1-.2.1-.3.1-.5C49.5 17.3 44.2 13 38 13c-5.5 0-10.2 3.4-12.2 8.2-.9-.7-2.1-1.1-3.4-1-2.3.2-4.2 2.1-4.5 4.4-.1.5-.1 1 0 1.5C14.2 26.5 11 30 11 34.2c0 .4 0 .7.1 1.1.1.2.2.3.4.3h31.8c.3 0 .6-.1.7-.4l.5-1z" fill="#f6821f"/>
+        <path d="M47.5 26.5c-.2 0-.3 0-.5.1-.1.2-.2.3-.1.5l-.4 1.4c-.5 1.7-.4 3.3.3 4.5.6 1.1 1.7 1.8 3 1.9l3.7.2c.2 0 .3.1.3.2.1.1 0 .2 0 .3-.1.2-.3.4-.5.4l-3.9.2c-2.8.2-5.4 2.5-6.1 5.5l-.3 1.1c0 .2.1.3.3.3h11.4c.2 0 .4-.2.5-.4.5-1.5.8-3.2.8-4.9-.1-5.8-4.4-10.6-8.5-11.3z" fill="#fbad41"/>
+      </svg>
+      <h2>Cloudflare Dashboard</h2>
+      <p>ورود به حساب کاربری</p>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">روش احراز هویت</label>
+      <select class="form-select" id="authMethod" onchange="onAuthMethodChange()">
+        <option value="token">API Token (پیشنهادی)</option>
+        <option value="apikey">Global API Key + Email</option>
+      </select>
+    </div>
+
+    <div class="form-group" id="emailGroup" style="display:none">
+      <label class="form-label">ایمیل</label>
+      <input class="form-input" id="loginEmail" type="email" placeholder="you@example.com" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" id="keyLabel">API Token</label>
+      <input class="form-input" id="loginKey" type="password" placeholder="API Token خود را وارد کنید" />
+      <div class="form-hint" id="keyHint">توکن از بخش My Profile → API Tokens قابل ساخت است</div>
+    </div>
+
+    <button class="btn btn-orange btn-block" id="loginBtn" onclick="doLogin()" style="margin-top:8px">
+      ورود به حساب
+    </button>
+
+    <div id="loginError" style="display:none; margin-top:12px; padding:10px; border-radius:8px; background:var(--cf-red-soft); color:var(--cf-red); font-size:13px;"></div>
+  </div>
+</div>
+
+<!-- ═══════════ MAIN APP ═══════════ -->
+<div id="mainApp" style="display:none">
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo">
+        <svg viewBox="0 0 64 64" fill="none"><path d="M44.5 35.2c.2-.7.1-1.4-.3-1.9-.4-.4-.9-.7-1.5-.7l-18.1-.2c-.1 0-.2-.1-.3-.2-.1-.1 0-.2 0-.3.1-.2.3-.4.5-.4l18.3-.2c2.5-.1 5.2-2.1 6.3-4.5l1.4-3.1c.1-.2.1-.3.1-.5C49.5 17.3 44.2 13 38 13c-5.5 0-10.2 3.4-12.2 8.2-.9-.7-2.1-1.1-3.4-1-2.3.2-4.2 2.1-4.5 4.4-.1.5-.1 1 0 1.5C14.2 26.5 11 30 11 34.2c0 .4 0 .7.1 1.1.1.2.2.3.4.3h31.8c.3 0 .6-.1.7-.4l.5-1z" fill="#f6821f"/><path d="M47.5 26.5c-.2 0-.3 0-.5.1-.1.2-.2.3-.1.5l-.4 1.4c-.5 1.7-.4 3.3.3 4.5.6 1.1 1.7 1.8 3 1.9l3.7.2c.2 0 .3.1.3.2.1.1 0 .2 0 .3-.1.2-.3.4-.5.4l-3.9.2c-2.8.2-5.4 2.5-6.1 5.5l-.3 1.1c0 .2.1.3.3.3h11.4c.2 0 .4-.2.5-.4.5-1.5.8-3.2.8-4.9-.1-5.8-4.4-10.6-8.5-11.3z" fill="#fbad41"/></svg>
+      </div>
+      <div class="topbar-title">Dashboard</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="topbar-btn" onclick="refreshCurrentView()" title="بروزرسانی">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+      </button>
+      <div class="topbar-user" onclick="doLogout()">
+        <div class="topbar-avatar" id="userAvatar">CF</div>
+        <span>خروج</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zone Selector -->
+  <div class="zone-selector" id="zoneSelector" style="display:none">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cf-gray-500)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    <select class="zone-select-dropdown" id="zoneDropdown" onchange="onZoneChange()"></select>
+  </div>
+
+  <!-- Nav Tabs -->
+  <div class="nav-tabs" id="navTabs" style="display:none">
+    <button class="nav-tab active" data-tab="overview" onclick="switchTab('overview')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      نمای کلی
+    </button>
+    <button class="nav-tab" data-tab="dns" onclick="switchTab('dns')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg>
+      DNS
+      <span class="nav-badge" id="dnsCount">0</span>
+    </button>
+  </div>
+
+  <!-- Loading Bar -->
+  <div class="loading-bar" id="loadingBar" style="display:none"></div>
+
+  <!-- Content -->
+  <div class="content" id="appContent">
+
+    <!-- OVERVIEW TAB -->
+    <div class="view active" id="viewOverview">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            اطلاعات دامنه
+          </div>
+        </div>
+        <div class="card-body" id="zoneInfoBody">
+          <div class="skeleton" style="height:120px;width:100%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DNS TAB -->
+    <div class="view" id="viewDns">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/></svg>
+            مدیریت رکوردهای DNS
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openAddModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            افزودن رکورد
+          </button>
+        </div>
+        <div class="card-body compact">
+          <div id="dnsFilterArea" style="padding:12px 16px"></div>
+          <div id="dnsTableArea">
+            <div style="padding:20px"><div class="skeleton" style="height:200px;width:100%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════ ADD/EDIT MODAL ═══════════ -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this)closeModal()">
+  <div class="modal-sheet" id="modalSheet">
+    <div class="modal-handle"></div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════ STATE ═══════════ */
+const S = {
+  token: '', email: '', auth: 'token',
+  zones: [], zone: null, dns: [],
+  activeTab: 'overview', filter: ''
+};
+
+const API = 'https://api.cloudflare.com/client/v4';
+
+/* ═══════════ API ═══════════ */
+function hdrs() {
+  return S.auth === 'token'
+    ? { 'Authorization': `Bearer ${S.token}`, 'Content-Type': 'application/json' }
+    : { 'X-Auth-Email': S.email, 'X-Auth-Key': S.token, 'Content-Type': 'application/json' };
+}
+
+async function cf(path, opt = {}) {
+  const r = await fetch(`${API}${path}`, { ...opt, headers: { ...hdrs(), ...(opt.headers||{}) } });
+  const d = await r.json();
+  if (!d.success) throw new Error(d.errors?.map(e=>e.message).join(', ')||'خطای ناشناخته');
+  return d;
+}
+
+/* ═══════════ HELPERS ═══════════ */
+const $ = id => document.getElementById(id);
+function showLoad() { $('loadingBar').style.display = 'block'; }
+function hideLoad() { $('loadingBar').style.display = 'none'; }
+
+function toast(msg, type='info') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+function openModal(html) {
+  $('modalContent').innerHTML = html;
+  $('modalBackdrop').classList.add('open');
+}
+function closeModal() {
+  $('modalBackdrop').classList.remove('open');
+}
+
+function switchTab(tab) {
+  S.activeTab = tab;
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  $(`view${tab.charAt(0).toUpperCase()+tab.slice(1)}`).classList.add('active');
+}
+
+/* ═══════════ AUTH ═══════════ */
+function onAuthMethodChange() {
+  const m = $('authMethod').value;
+  $('emailGroup').style.display = m === 'apikey' ? 'block' : 'none';
+  $('keyLabel').textContent = m === 'token' ? 'API Token' : 'Global API Key';
+  $('loginKey').placeholder = m === 'token' ? 'API Token خود را وارد کنید' : 'Global API Key خود را وارد کنید';
+  $('keyHint').textContent = m === 'token'
+    ? 'توکن از بخش My Profile → API Tokens قابل ساخت است'
+    : 'از بخش My Profile → API Tokens → Global API Key';
+}
+
+async function doLogin() {
+  const method = $('authMethod').value;
+  const key = $('loginKey').value.trim();
+  const email = $('loginEmail').value.trim();
+
+  if (!key) { showLoginErr('لطفاً توکن/کلید را وارد کنید'); return; }
+  if (method === 'apikey' && !email) { showLoginErr('لطفاً ایمیل را وارد کنید'); return; }
+
+  S.auth = method;
+  S.token = key;
+  S.email = email;
+
+  $('loginBtn').disabled = true;
+  $('loginBtn').textContent = 'در حال بررسی...';
+  $('loginError').style.display = 'none';
+
+  try {
+    if (method === 'token') {
+      await cf('/user/tokens/verify');
+    } else {
+      await cf('/zones?per_page=1');
+    }
+    localStorage.setItem('cf_auth', JSON.stringify({ auth: S.auth, token: S.token, email: S.email }));
+    $('loginScreen').style.display = 'none';
+    $('mainApp').style.display = 'block';
+    await loadApp();
+  } catch(e) {
+    showLoginErr(`خطا در احراز هویت: ${e.message}`);
+  }
+
+  $('loginBtn').disabled = false;
+  $('loginBtn').textContent = 'ورود به حساب';
+}
+
+function showLoginErr(msg) {
+  const el = $('loginError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function doLogout() {
+  S.token = ''; S.email = '';
+  S.zones = []; S.zone = null; S.dns = [];
+  localStorage.removeItem('cf_auth');
+  $('mainApp').style.display = 'none';
+  $('loginScreen').style.display = 'flex';
+  $('loginKey').value = '';
+  $('loginEmail').value = '';
+  toast('از حساب خارج شدید', 'info');
+}
+
+/* ═══════════ LOAD APP ═══════════ */
+async function loadApp() {
+  showLoad();
+  try {
+    let all = [], p = 1;
+    do {
+      const d = await cf(`/zones?per_page=50&page=${p}`);
+      all = all.concat(d.result);
+      if (p >= (d.result_info?.total_pages||1)) break;
+      p++;
+    } while(true);
+
+    S.zones = all;
+    renderZoneSelector();
+    if (all.length > 0) {
+      // Check URL params for pre-selected zone
+      const params = new URLSearchParams(location.search);
+      const preZone = params.get('zone');
+      const idx = preZone ? all.findIndex(z=>z.id===preZone) : 0;
+      $('zoneDropdown').selectedIndex = idx >= 0 ? idx : 0;
+      await selectZone(all[idx >= 0 ? idx : 0]);
+    }
+    $('zoneSelector').style.display = 'flex';
+    $('navTabs').style.display = 'flex';
+  } catch(e) {
+    toast('خطا در دریافت اطلاعات: ' + e.message, 'error');
+  }
+  hideLoad();
+}
+
+function renderZoneSelector() {
+  const dd = $('zoneDropdown');
+  dd.innerHTML = '';
+  S.zones.forEach((z, i) => {
+    const st = z.status === 'active' ? '🟢' : z.status === 'pending' ? '🟡' : '🔴';
+    const opt = document.createElement('option');
+    opt.value = z.id;
+    opt.textContent = `${st} ${z.name} — ${z.plan?.name||'Free'}`;
+    dd.appendChild(opt);
+  });
+}
+
+async function onZoneChange() {
+  const zid = $('zoneDropdown').value;
+  const zone = S.zones.find(z=>z.id===zid);
+  if (zone) await selectZone(zone);
+}
+
+async function selectZone(zone) {
+  S.zone = zone;
+  renderZoneInfo();
+  await loadDNS();
+}
+
+function renderZoneInfo() {
+  const z = S.zone;
+  if (!z) return;
+  const statusMap = { active: ['فعال','active'], pending: ['در انتظار','pending'], moved: ['منتقل شده','inactive'] };
+  const [stText, stClass] = statusMap[z.status] || [z.status, 'inactive'];
+  const ns = z.name_servers?.map(n=>`<code style="font-size:12px">${n}</code>`).join('<br>') || '—';
+
+  $('zoneInfoBody').innerHTML = `
+    <div class="info-row"><span class="info-label">دامنه</span><span class="info-value">${z.name}</span></div>
+    <div class="info-row"><span class="info-label">وضعیت</span><span><span class="status ${stClass}"><span class="status-dot"></span>${stText}</span></span></div>
+    <div class="info-row"><span class="info-label">پلن</span><span class="info-value">${z.plan?.name||'Free'}</span></div>
+    <div class="info-row"><span class="info-label">نیم‌سرورها</span><span class="info-value">${ns}</span></div>
+    <div class="info-row"><span class="info-label">شناسه</span><span class="info-value text-xs">${z.id}</span></div>
+    <div class="mt-16">
+      <button class="btn btn-primary" onclick="switchTab('dns')">مدیریت DNS</button>
+    </div>
+  `;
+}
+
+/* ═══════════ DNS ═══════════ */
+async function loadDNS() {
+  if (!S.zone) return;
+  showLoad();
+  try {
+    let all = [], p = 1;
+    do {
+      const d = await cf(`/zones/${S.zone.id}/dns_records?per_page=100&page=${p}`);
+      all = all.concat(d.result);
+      if (p >= (d.result_info?.total_pages||1)) break;
+      p++;
+    } while(true);
+    S.dns = all;
+    $('dnsCount').textContent = all.length;
+    renderDNSFilters();
+    renderDNSTable();
+  } catch(e) {
+    toast('خطا: ' + e.message, 'error');
+  }
+  hideLoad();
+}
+
+function renderDNSFilters() {
+  const types = {};
+  S.dns.forEach(r=>{ types[r.type]=(types[r.type]||0)+1; });
+  let html = '<div class="filter-pills">';
+  html += `<button class="filter-pill ${S.filter===''?'active':''}" onclick="setFilter('')">همه (${S.dns.length})</button>`;
+  Object.keys(types).sort().forEach(t => {
+    html += `<button class="filter-pill ${S.filter===t?'active':''}" onclick="setFilter('${t}')">${t} (${types[t]})</button>`;
+  });
+  html += '</div>';
+  $('dnsFilterArea').innerHTML = html;
+}
+
+function setFilter(type) {
+  S.filter = type;
+  renderDNSFilters();
+  renderDNSTable();
+}
+
+function renderDNSTable() {
+  const records = S.filter ? S.dns.filter(r=>r.type===S.filter) : S.dns;
+
+  if (!records.length) {
+    $('dnsTableArea').innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/></svg>
+        <h3>رکوردی یافت نشد</h3>
+        <p>هنوز رکورد DNS‌ای اضافه نشده است.</p>
+        <button class="btn btn-primary" onclick="openAddModal()">افزودن رکورد</button>
+      </div>`;
+    return;
+  }
+
+  let html = `<table class="dns-table"><thead><tr>
+    <th>نوع</th><th class="ltr">نام</th><th class="ltr">محتوا</th>
+    <th>پروکسی</th><th>TTL</th><th>عملیات</th>
+  </tr></thead><tbody>`;
+
+  records.forEach(r => {
+    const proxy = r.proxied
+      ? `<span class="proxy-icon on"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>فعال</span>`
+      : `<span class="proxy-icon off"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>خاموش</span>`;
+    const ttl = r.ttl === 1 ? 'خودکار' : (r.ttl >= 3600 ? `${r.ttl/3600}h` : `${r.ttl}s`);
+    const nameShort = r.name.replace(`.${S.zone.name}`, '') || '@';
+    const contentShort = r.content.length > 45 ? r.content.substring(0,45)+'…' : r.content;
+
+    html += `<tr>
+      <td><span class="type-badge ${r.type}">${r.type}</span></td>
+      <td class="ltr"><span class="name-cell">${nameShort}</span></td>
+      <td class="ltr"><span class="content-cell" title="${r.content}">${contentShort}</span></td>
+      <td>${['A','AAAA','CNAME'].includes(r.type) ? proxy : '—'}</td>
+      <td><span class="ttl-cell">${ttl}</span></td>
+      <td><div class="actions-cell">
+        <button class="action-btn" onclick="openEditModal('${r.id}')" title="ویرایش">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="action-btn danger" onclick="confirmDelete('${r.id}','${r.name.replace(/'/g,"\\'")}')" title="حذف">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div></td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  $('dnsTableArea').innerHTML = html;
+}
+
+/* ═══════════ ADD RECORD ═══════════ */
+function openAddModal() {
+  openModal(`
+    <div class="modal-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cf-blue-600)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      افزودن رکورد DNS
+    </div>
+    <div class="form-group">
+      <label class="form-label">نوع</label>
+      <select class="form-select" id="addType" onchange="onAddTypeChange()">
+        <option value="A">A — آدرس IPv4</option>
+        <option value="AAAA">AAAA — آدرس IPv6</option>
+        <option value="CNAME">CNAME — نام متعارف</option>
+        <option value="MX">MX — سرور ایمیل</option>
+        <option value="TXT">TXT — متن</option>
+        <option value="NS">NS — نیم‌سرور</option>
+        <option value="SRV">SRV — سرویس</option>
+        <option value="CAA">CAA — مجوز CA</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">نام</label>
+      <input class="form-input" id="addName" value="@" placeholder="@ برای ریشه دامنه" />
+      <div class="form-hint">.${S.zone?.name||''}</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">محتوا</label>
+      <input class="form-input" id="addContent" placeholder="1.2.3.4" />
+    </div>
+    <div class="form-group" id="addPriGrp" style="display:none">
+      <label class="form-label">اولویت (Priority)</label>
+      <input class="form-input" id="addPriority" type="number" value="10" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">TTL</label>
+      <select class="form-select" id="addTTL">
+        <option value="1">خودکار</option>
+        <option value="60">1 دقیقه</option>
+        <option value="300">5 دقیقه</option>
+        <option value="3600">1 ساعت</option>
+        <option value="86400">1 روز</option>
+      </select>
+    </div>
+    <div class="form-group" id="addProxyGrp">
+      <div class="form-toggle" onclick="toggleProxy('addProxy')">
+        <div class="toggle-track on" id="addProxyTrack"><div class="toggle-handle"></div></div>
+        <span class="toggle-label">پروکسی Cloudflare (ابر نارنجی)</span>
+      </div>
+      <input type="hidden" id="addProxy" value="true" />
+    </div>
+    <div class="btn-group mt-16">
+      <button class="btn btn-primary" onclick="submitAdd()" style="flex:1">ذخیره رکورد</button>
+      <button class="btn btn-outline" onclick="closeModal()">انصراف</button>
+    </div>
+  `);
+}
+
+function onAddTypeChange() {
+  const t = $('addType')?.value;
+  if (!t) return;
+  const pg = $('addPriGrp');
+  const pxg = $('addProxyGrp');
+  if(pg) pg.style.display = ['MX','SRV'].includes(t) ? 'block' : 'none';
+  if(pxg) pxg.style.display = ['A','AAAA','CNAME'].includes(t) ? 'block' : 'none';
+  const ph = {A:'1.2.3.4',AAAA:'2001:db8::1',CNAME:'example.com',MX:'mail.example.com',TXT:'v=spf1 ...',NS:'ns1.example.com',SRV:'0 5 5060 sip.example.com',CAA:'0 issue "letsencrypt.org"'};
+  const ci = $('addContent');
+  if(ci) ci.placeholder = ph[t]||'';
+}
+
+function toggleProxy(inputId) {
+  const input = $(inputId);
+  const track = $(inputId + 'Track');
+  const on = input.value === 'true';
+  input.value = on ? 'false' : 'true';
+  track.classList.toggle('on', !on);
+}
+
+async function submitAdd() {
+  const type = $('addType').value;
+  let name = $('addName').value.trim();
+  const content = $('addContent').value.trim();
+  const ttl = parseInt($('addTTL').value);
+  const proxied = $('addProxy')?.value === 'true';
+  const priority = parseInt($('addPriority')?.value) || 10;
+
+  if (!content) { toast('لطفاً محتوا را وارد کنید', 'error'); return; }
+  if (name === '@') name = S.zone.name;
+  else if (!name.endsWith(S.zone.name)) name = `${name}.${S.zone.name}`;
+
+  const body = { type, name, content, ttl };
+  if (['A','AAAA','CNAME'].includes(type)) body.proxied = proxied;
+  if (['MX','SRV'].includes(type)) body.priority = priority;
+
+  closeModal();
+  showLoad();
+  try {
+    await cf(`/zones/${S.zone.id}/dns_records`, { method: 'POST', body: JSON.stringify(body) });
+    toast('رکورد ایجاد شد!', 'success');
+    await loadDNS();
+  } catch(e) {
+    toast('خطا: ' + e.message, 'error');
+  }
+  hideLoad();
+}
+
+/* ═══════════ EDIT RECORD ═══════════ */
+function openEditModal(id) {
+  const r = S.dns.find(x=>x.id===id);
+  if (!r) return;
+  const ip = ['A','AAAA','CNAME'].includes(r.type);
+  const hp = ['MX','SRV'].includes(r.type);
+
+  openModal(`
+    <div class="modal-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cf-blue-600)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      ویرایش رکورد ${r.type}
+    </div>
+    <div class="form-group">
+      <label class="form-label">نوع</label>
+      <input class="form-input" value="${r.type}" disabled style="opacity:0.5" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">نام</label>
+      <input class="form-input" id="editName" value="${r.name}" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">محتوا</label>
+      <input class="form-input" id="editContent" value="${r.content}" />
+    </div>
+    ${hp ? `<div class="form-group"><label class="form-label">اولویت</label><input class="form-input" id="editPri" type="number" value="${r.priority||10}" /></div>` : ''}
+    <div class="form-group">
+      <label class="form-label">TTL</label>
+      <select class="form-select" id="editTTL">
+        <option value="1" ${r.ttl===1?'selected':''}>خودکار</option>
+        <option value="60" ${r.ttl===60?'selected':''}>1 دقیقه</option>
+        <option value="300" ${r.ttl===300?'selected':''}>5 دقیقه</option>
+        <option value="3600" ${r.ttl===3600?'selected':''}>1 ساعت</option>
+        <option value="86400" ${r.ttl===86400?'selected':''}>1 روز</option>
+      </select>
+    </div>
+    ${ip ? `
+    <div class="form-group">
+      <div class="form-toggle" onclick="toggleProxy('editProxy')">
+        <div class="toggle-track ${r.proxied?'on':''}" id="editProxyTrack"><div class="toggle-handle"></div></div>
+        <span class="toggle-label">پروکسی Cloudflare</span>
+      </div>
+      <input type="hidden" id="editProxy" value="${r.proxied}" />
+    </div>` : ''}
+    <div class="btn-group mt-16">
+      <button class="btn btn-primary" onclick="submitEdit('${id}','${r.type}')" style="flex:1">ذخیره تغییرات</button>
+      <button class="btn btn-outline" onclick="closeModal()">انصراف</button>
+    </div>
+  `);
+}
+
+async function submitEdit(id, type) {
+  const name = $('editName').value.trim();
+  const content = $('editContent').value.trim();
+  const ttl = parseInt($('editTTL').value);
+  const proxied = $('editProxy')?.value === 'true';
+  const priority = parseInt($('editPri')?.value) || undefined;
+
+  if (!content) { toast('محتوا نمی‌تواند خالی باشد', 'error'); return; }
+  const body = { type, name, content, ttl };
+  if (['A','AAAA','CNAME'].includes(type)) body.proxied = proxied;
+  if (priority !== undefined) body.priority = priority;
+
+  closeModal(); showLoad();
+  try {
+    await cf(`/zones/${S.zone.id}/dns_records/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+    toast('رکورد بروزرسانی شد!', 'success');
+    await loadDNS();
+  } catch(e) { toast('خطا: ' + e.message, 'error'); }
+  hideLoad();
+}
+
+/* ═══════════ DELETE ═══════════ */
+function confirmDelete(id, name) {
+  openModal(`
+    <div class="modal-title" style="color:var(--cf-red)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      حذف رکورد
+    </div>
+    <p style="font-size:14px;color:var(--cf-gray-600);margin-bottom:8px">آیا از حذف رکورد زیر اطمینان دارید؟</p>
+    <div style="background:var(--cf-gray-50);border-radius:8px;padding:12px;margin-bottom:16px;direction:ltr;text-align:left;font-family:monospace;font-size:13px;color:var(--cf-gray-700)">${name}</div>
+    <p style="font-size:12px;color:var(--cf-red);margin-bottom:16px">⚠️ این عمل قابل بازگشت نیست.</p>
+    <div class="btn-group">
+      <button class="btn btn-danger" onclick="doDelete('${id}')" style="flex:1">حذف رکورد</button>
+      <button class="btn btn-outline" onclick="closeModal()">انصراف</button>
+    </div>
+  `);
+}
+
+async function doDelete(id) {
+  closeModal(); showLoad();
+  try {
+    await cf(`/zones/${S.zone.id}/dns_records/${id}`, { method: 'DELETE' });
+    toast('رکورد حذف شد!', 'success');
+    await loadDNS();
+  } catch(e) { toast('خطا: ' + e.message, 'error'); }
+  hideLoad();
+}
+
+/* ═══════════ REFRESH ═══════════ */
+function refreshCurrentView() {
+  if (S.activeTab === 'dns') loadDNS();
+  else if (S.zone) selectZone(S.zone);
+}
+
+/* ═══════════ TELEGRAM + INIT ═══════════ */
+try {
+  if (window.Telegram?.WebApp) {
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    tg.MainButton.hide();
+  }
+} catch(e) {}
+
+// Auto-login from localStorage
+const saved = localStorage.getItem('cf_auth');
+if (saved) {
+  try {
+    const d = JSON.parse(saved);
+    S.auth = d.auth; S.token = d.token; S.email = d.email;
+    $('loginScreen').style.display = 'none';
+    $('mainApp').style.display = 'block';
+    loadApp();
+  } catch(e) {
+    localStorage.removeItem('cf_auth');
+  }
+}
+</script>
+</body>
+</html>
