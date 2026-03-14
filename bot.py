@@ -18,15 +18,22 @@ from telegram.ext import (
 )
 
 # ━━━━━━━━━━ CONFIG ━━━━━━━━━━
-# توکن خود را اینجا قرار دهید یا از Environment Variables استفاده کنید
-BOT_TOKEN = os.getenv("BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://your-webapp-url.com")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "")
 CF_API = "https://api.cloudflare.com/client/v4"
+
+if not BOT_TOKEN:
+    raise ValueError("BOT_TOKEN is required. Set via environment variable or .env file.")
+if not WEBAPP_URL:
+    raise ValueError("WEBAPP_URL is required. Set via environment variable or .env file.")
 
 logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # ━━━━━━━━━━ FORCE IPv4 GLOBALLY ━━━━━━━━━━
+# Monkey-patch socket to prefer IPv4
+# This fixes "Cannot use access token from location" errors
+# when the server connects via IPv6 but CF token doesn't allow it
 _orig_getaddrinfo = socket.getaddrinfo
 
 def _ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
