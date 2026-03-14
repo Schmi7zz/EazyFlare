@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EazyFlare Dashboard</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--cf-blue-900:#0a1628;--cf-blue-800:#0d2137;--cf-blue-700:#003681;--cf-blue-600:#0051a3;--cf-blue-500:#1166c5;--cf-blue-100:#e0ecfc;--cf-blue-50:#f0f6ff;--cf-orange:#f6821f;--cf-orange-hover:#e5750e;--cf-orange-soft:#fff5eb;--cf-green:#2fa85d;--cf-green-soft:#eefaf3;--cf-red:#d63e3e;--cf-red-soft:#fcedee;--cf-yellow:#e4a11b;--cf-yellow-soft:#fef9ec;--g900:#1a1a1a;--g700:#404040;--g600:#555;--g500:#737373;--g400:#a0a0a0;--g300:#c5c5c5;--g200:#e5e5e5;--g100:#f3f3f3;--g50:#fafafa;--white:#fff;--r:8px;--rl:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--g100);color:var(--g900);min-height:100vh;-webkit-tap-highlight-color:transparent}
+body.rtl{direction:rtl;font-family:'Vazirmatn',sans-serif}
+body.rtl .ltr{direction:ltr;text-align:left}
+
+/* Topbar */
+.topbar{background:var(--cf-blue-900);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-brand{display:flex;align-items:center;gap:10px}
+.topbar-brand img{height:28px}
+.topbar-title{color:#fff;font-size:15px;font-weight:700}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.topbar-btn{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.8);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;font-size:14px}
+.topbar-btn:hover{background:rgba(255,255,255,.2);color:#fff}
+.topbar-btn svg{width:18px;height:18px}
+.topbar-user{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.8);font-size:12px;padding:4px 10px 4px 4px;border-radius:20px;background:rgba(255,255,255,.08);cursor:pointer}
+.topbar-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--cf-orange),#e27625);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+
+/* Nav */
+.nav-tabs{background:var(--white);border-bottom:1px solid var(--g200);display:flex;overflow-x:auto;scrollbar-width:none}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{padding:12px 16px;font-size:13px;font-weight:500;color:var(--g500);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:.15s;font-family:inherit;display:flex;align-items:center;gap:6px}
+.nav-tab:hover{color:var(--g700)}.nav-tab.active{color:var(--cf-blue-600);border-bottom-color:var(--cf-blue-600);font-weight:600}
+.nav-tab svg{width:16px;height:16px}
+.nav-badge{font-size:10px;background:var(--cf-blue-100);color:var(--cf-blue-700);padding:1px 6px;border-radius:10px;font-weight:700}
+
+/* Layout */
+.content{max-width:960px;margin:0 auto;padding:16px}
+.card{background:var(--white);border:1px solid var(--g200);border-radius:var(--rl);box-shadow:0 1px 2px rgba(0,0,0,.06);margin-bottom:16px;overflow:hidden}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.card-title svg{width:18px;height:18px;color:var(--cf-blue-600)}
+.card-body{padding:20px}.card-body.compact{padding:0}
+
+/* Login */
+.login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:linear-gradient(180deg,var(--cf-blue-900) 0%,var(--cf-blue-800) 40%,var(--g100) 40%)}
+.login-card{background:var(--white);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.12);width:100%;max-width:400px;padding:32px 28px}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo img{width:72px;height:72px;object-fit:contain}
+.login-logo h2{font-size:20px;font-weight:800;margin-top:12px}
+.login-logo p{font-size:13px;color:var(--g500);margin-top:4px}
+
+/* Forms */
+.fg{margin-bottom:16px}
+.fl{display:block;font-size:13px;font-weight:600;color:var(--g700);margin-bottom:6px}
+.fi{width:100%;padding:10px 14px;border:1px solid var(--g300);border-radius:var(--r);font-family:inherit;font-size:14px;color:var(--g900);background:var(--white);outline:none;transition:.15s;direction:ltr;text-align:left}
+.fi:focus{border-color:var(--cf-blue-500);box-shadow:0 0 0 3px rgba(17,102,197,.15)}
+.fi::placeholder{color:var(--g400)}.fi[disabled]{opacity:.5}
+.fs{width:100%;padding:10px 14px;border:1px solid var(--g300);border-radius:var(--r);font-family:inherit;font-size:14px;color:var(--g900);background:var(--white);outline:none;cursor:pointer;-webkit-appearance:none}
+.fs:focus{border-color:var(--cf-blue-500);box-shadow:0 0 0 3px rgba(17,102,197,.15)}
+.fh{font-size:11px;color:var(--g500);margin-top:4px}
+.ferr{display:none;margin-top:12px;padding:10px;border-radius:8px;background:var(--cf-red-soft);color:var(--cf-red);font-size:13px}
+
+/* Toggle */
+.ftg{display:flex;align-items:center;gap:10px;cursor:pointer}
+.tg-track{width:40px;height:22px;background:var(--g300);border-radius:11px;position:relative;transition:.2s;flex-shrink:0}
+.tg-track.on{background:var(--cf-orange)}
+.tg-knob{width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tg-track.on .tg-knob{right:20px}
+body.rtl .tg-knob{right:auto;left:2px}
+body.rtl .tg-track.on .tg-knob{left:20px;right:auto}
+.tg-label{font-size:13px;color:var(--g700)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:var(--r);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid transparent;white-space:nowrap}
+.btn svg{width:16px;height:16px}
+.btn-pri{background:var(--cf-blue-600);color:#fff}.btn-pri:hover{background:var(--cf-blue-700)}
+.btn-or{background:var(--cf-orange);color:#fff}.btn-or:hover{background:var(--cf-orange-hover)}
+.btn-out{background:var(--white);color:var(--g700);border:1px solid var(--g300)}.btn-out:hover{background:var(--g50)}
+.btn-dng{background:var(--cf-red);color:#fff}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-block{width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-group{display:flex;gap:8px}
+
+/* Table */
+.dns-table{width:100%;border-collapse:collapse}
+.dns-table thead th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;background:var(--g50);border-bottom:1px solid var(--g200)}
+body.rtl .dns-table thead th{text-align:right}
+.dns-table tbody tr{border-bottom:1px solid var(--g100);transition:.1s}
+.dns-table tbody tr:hover{background:var(--cf-blue-50)}
+.dns-table tbody tr:last-child{border-bottom:none}
+.dns-table tbody td{padding:12px 16px;font-size:13px;vertical-align:middle}
+.tbadge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;font-family:'Courier New',monospace}
+.tbadge.A{background:#e0ecfc;color:#003681}.tbadge.AAAA{background:#ede9fe;color:#5b21b6}.tbadge.CNAME{background:#eefaf3;color:#166534}.tbadge.MX{background:#fef9ec;color:#92400e}.tbadge.TXT{background:#fce7f3;color:#9d174d}.tbadge.NS{background:#e0f2fe;color:#075985}.tbadge.SRV{background:#fff7ed;color:#9a3412}.tbadge.CAA{background:#f3e8ff;color:#6b21a8}
+.px-icon{display:inline-flex;align-items:center;gap:4px;font-size:11px}
+.px-icon.on{color:var(--cf-orange)}.px-icon.off{color:var(--g400)}
+.px-icon svg{width:16px;height:16px}
+.n-cell,.c-cell{font-family:'SF Mono','Courier New',monospace;font-size:12px;word-break:break-all;direction:ltr;text-align:left}
+.n-cell{font-weight:600;color:var(--g900)}.c-cell{color:var(--g600);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-cell{font-size:12px;color:var(--g500)}
+.a-cell{display:flex;gap:4px}
+.abtn{width:30px;height:30px;border-radius:6px;border:1px solid var(--g200);background:#fff;color:var(--g500);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+.abtn svg{width:14px;height:14px}
+.abtn:hover{background:var(--g50);color:var(--g700)}.abtn.danger:hover{background:var(--cf-red-soft);color:var(--cf-red);border-color:var(--cf-red)}
+
+/* Status */
+.st{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px}
+.st.active{background:var(--cf-green-soft);color:var(--cf-green)}.st.pending{background:var(--cf-yellow-soft);color:var(--cf-yellow)}.st.inactive{background:var(--cf-red-soft);color:var(--cf-red)}
+.st-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* Zone selector */
+.zone-sel{background:var(--white);border-bottom:1px solid var(--g200);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.zone-dd{flex:1;padding:8px 12px;border:1px solid var(--g300);border-radius:var(--r);font-family:inherit;font-size:14px;font-weight:600;background:var(--white);color:var(--g900);cursor:pointer;outline:none;direction:ltr}
+
+/* Modal */
+.mo-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.mo-bg.open{display:flex}
+.mo-sheet{background:var(--white);border-radius:16px 16px 0 0;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;padding:24px 20px;animation:shUp .3s cubic-bezier(.22,1,.36,1)}
+@keyframes shUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mo-handle{width:36px;height:4px;background:var(--g300);border-radius:2px;margin:0 auto 16px}
+.mo-title{font-size:17px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+
+/* Toast */
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-80px);padding:10px 20px;border-radius:var(--r);font-size:13px;font-weight:600;z-index:200;transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 4px 16px rgba(0,0,0,.1);font-family:inherit}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--cf-green);color:#fff}.toast.err{background:var(--cf-red);color:#fff}.toast.nfo{background:var(--cf-blue-600);color:#fff}
+
+/* Loading */
+.lbar{height:3px;background:var(--g200);position:relative;overflow:hidden}
+.lbar::after{content:'';position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(90deg,transparent,var(--cf-orange),transparent);animation:lslide 1.2s infinite}
+@keyframes lslide{0%{left:-40%}100%{left:100%}}
+.skeleton{background:linear-gradient(90deg,var(--g100) 25%,var(--g200) 50%,var(--g100) 75%);background-size:200% 100%;animation:shim 1.5s infinite;border-radius:4px}
+@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* Empty / Filter */
+.empty{text-align:center;padding:40px 20px}
+.empty svg{width:56px;height:56px;color:var(--g300);margin-bottom:16px}
+.empty h3{font-size:16px;font-weight:700;color:var(--g700);margin-bottom:4px}
+.empty p{font-size:13px;color:var(--g500);margin-bottom:16px}
+.f-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.f-pill{padding:4px 12px;border-radius:16px;border:1px solid var(--g300);background:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;color:var(--g600)}
+.f-pill:hover{border-color:var(--cf-blue-500);color:var(--cf-blue-600)}
+.f-pill.active{background:var(--cf-blue-600);color:#fff;border-color:var(--cf-blue-600)}
+.irow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--g100);font-size:13px}
+.irow:last-child{border-bottom:none}
+.ilbl{color:var(--g500);font-weight:500}
+.ival{color:var(--g900);font-weight:600;direction:ltr}
+
+/* Footer */
+.footer{text-align:center;padding:20px 16px 24px;font-size:12px;color:var(--g400)}
+.footer a{color:var(--cf-orange);text-decoration:none;font-weight:600}
+.footer a:hover{text-decoration:underline}
+
+/* Responsive */
+@media(max-width:600px){
+  .dns-table thead{display:none}
+  .dns-table tbody tr{display:flex;flex-wrap:wrap;padding:12px 16px;gap:6px;align-items:center}
+  .dns-table tbody td{padding:0;border:none}
+  .c-cell{max-width:none;white-space:normal}
+}
+.view{display:none;animation:vIn .25s ease}.view.active{display:block}
+@keyframes vIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.mt-16{margin-top:16px}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="logo.png" alt="EazyFlare">
+      <h2>EazyFlare</h2>
+      <p id="loginSubtitle">Cloudflare DNS Dashboard</p>
+    </div>
+    <div style="text-align:center;margin-bottom:16px">
+      <button class="btn btn-sm btn-out" onclick="setLang('en')" id="langEn" style="font-weight:700">EN</button>
+      <button class="btn btn-sm btn-out" onclick="setLang('fa')" id="langFa">فا</button>
+    </div>
+    <div class="fg">
+      <label class="fl" id="lAuthLabel">Authentication Method</label>
+      <select class="fs" id="authMethod" onchange="onAuthChange()">
+        <option value="token" id="optToken">API Token (recommended)</option>
+        <option value="apikey" id="optApikey">Global API Key + Email</option>
+      </select>
+    </div>
+    <div class="fg" id="emailGrp" style="display:none">
+      <label class="fl" id="lEmailLabel">Email</label>
+      <input class="fi" id="loginEmail" type="email" placeholder="you@example.com"/>
+    </div>
+    <div class="fg">
+      <label class="fl" id="keyLbl">API Token</label>
+      <input class="fi" id="loginKey" type="password" id="loginKeyPlaceholder"/>
+      <div class="fh" id="keyHint">From My Profile → API Tokens</div>
+    </div>
+    <button class="btn btn-or btn-block" id="loginBtn" onclick="doLogin()" style="margin-top:8px" data-en="Sign In" data-fa="ورود به حساب">Sign In</button>
+    <div class="ferr" id="loginErr"></div>
+    <div class="footer" style="margin-top:24px" id="loginFooter">Made with ♡ by <a href="https://t.me/SchmitzWS" target="_blank">Schmitz</a></div>
+  </div>
+</div>
+
+<div id="mainApp" style="display:none">
+  <div class="topbar">
+    <div class="topbar-brand"><img src="logo.png" alt="" style="height:28px"><div class="topbar-title">EazyFlare</div></div>
+    <div class="topbar-actions">
+      <button class="topbar-btn" onclick="setLang(L==='en'?'fa':'en')" id="langToggle" title="Language">فا</button>
+      <button class="topbar-btn" onclick="refreshView()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></button>
+      <div class="topbar-user" onclick="doLogout()"><div class="topbar-avatar">CF</div><span id="logoutTxt">Logout</span></div>
+    </div>
+  </div>
+  <div class="zone-sel" id="zoneSel" style="display:none">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--g500)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    <select class="zone-dd" id="zoneDd" onchange="onZoneChange()"></select>
+  </div>
+  <div class="nav-tabs" id="navTabs" style="display:none">
+    <button class="nav-tab active" data-tab="overview" onclick="switchTab('overview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span id="tabOverview">Overview</span></button>
+    <button class="nav-tab" data-tab="dns" onclick="switchTab('dns')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg><span>DNS</span><span class="nav-badge" id="dnsCount">0</span></button>
+  </div>
+  <div class="lbar" id="lbar" style="display:none"></div>
+  <div class="content">
+    <div class="view active" id="viewOverview"><div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span id="cardInfoTitle">Domain Info</span></div></div><div class="card-body" id="zoneInfo"><div class="skeleton" style="height:120px"></div></div></div></div>
+    <div class="view" id="viewDns"><div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/></svg><span id="cardDnsTitle">DNS Records</span></div><button class="btn btn-pri btn-sm" onclick="openAddModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span id="btnAddTxt">Add</span></button></div><div class="card-body compact"><div id="dnsFilters" style="padding:12px 16px"></div><div id="dnsArea"><div style="padding:20px"><div class="skeleton" style="height:200px"></div></div></div></div></div></div>
+    <div class="footer" id="appFooter">Made with ♡ by <a href="https://t.me/SchmitzWS" target="_blank">Schmitz</a></div>
+  </div>
+</div>
+<div class="mo-bg" id="moBg" onclick="if(event.target===this)closeMo()"><div class="mo-sheet"><div class="mo-handle"></div><div id="moBody"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════ CONFIG ══════ */
+var PROXY = ""; // SET YOUR WORKER URL: https://your-worker.your-subdomain.workers.dev
+
+/* ══════ i18n ══════ */
+var L = localStorage.getItem('ef_lang') || 'en';
+var T = {
+  en: {
+    subtitle: "Cloudflare DNS Dashboard", authLabel: "Authentication Method",
+    optToken: "API Token (recommended)", optApikey: "Global API Key + Email",
+    emailLabel: "Email", tokenLabel: "API Token", keyLabel: "Global API Key",
+    tokenPh: "Enter your API Token", keyPh: "Enter your Global API Key",
+    tokenHint: "From My Profile → API Tokens", signIn: "Sign In", checking: "Checking...",
+    errToken: "Please enter token/key", errEmail: "Please enter email",
+    error: "Error", logout: "Logout", overview: "Overview", domainInfo: "Domain Info",
+    dnsRecords: "DNS Records", add: "Add", domain: "Domain", status: "Status",
+    plan: "Plan", nameservers: "Nameservers", id: "ID", manageDns: "Manage DNS",
+    records: "records", all: "All", noRecords: "No records found",
+    noRecordsDesc: "No DNS records added yet", addRecord: "Add Record",
+    type: "Type", name: "Name", content: "Content", proxy: "Proxy", ttl: "TTL",
+    actions: "Actions", on: "On", off: "Off", auto: "Auto", save: "Save",
+    cancel: "Cancel", editRecord: "Edit Record", deleteRecord: "Delete Record",
+    deleteConfirm: "Delete this record?", deleteWarn: "This cannot be undone!",
+    delete: "Delete", created: "Record created!", updated: "Updated!", deleted: "Deleted!",
+    proxyLabel: "Cloudflare Proxy (orange cloud)", priority: "Priority",
+    min1: "1 min", min5: "5 min", hour1: "1 hour", day1: "1 day",
+    loading: "Loading...", noZones: "No domains found", disconnected: "Logged out",
+    and: "and", more: "more", refresh: "Refresh",
+    footer: 'Made with ♡ by <a href="https://t.me/SchmitzWS" target="_blank">Schmitz</a>',
+    active: "Active", pending: "Pending", moved: "Moved",
+    recType: "Record type", recName: "Name", recContent: "Content",
+    rootHint: "Use @ for root domain",
+    ipv4ph: "1.2.3.4", ipv6ph: "2001:db8::1", cnamePh: "example.com",
+    mxPh: "mail.example.com", txtPh: "v=spf1 ...", nsPh: "ns1.example.com",
+    srvPh: "priority weight port target", caaPh: '0 issue "letsencrypt.org"'
+  },
+  fa: {
+    subtitle: "داشبورد مدیریت DNS کلادفلر", authLabel: "روش احراز هویت",
+    optToken: "API Token (پیشنهادی)", optApikey: "Global API Key + ایمیل",
+    emailLabel: "ایمیل", tokenLabel: "API Token", keyLabel: "Global API Key",
+    tokenPh: "API Token خود را وارد کنید", keyPh: "Global API Key خود را وارد کنید",
+    tokenHint: "از بخش My Profile → API Tokens", signIn: "ورود به حساب", checking: "در حال بررسی...",
+    errToken: "لطفاً توکن/کلید را وارد کنید", errEmail: "لطفاً ایمیل را وارد کنید",
+    error: "خطا", logout: "خروج", overview: "نمای کلی", domainInfo: "اطلاعات دامنه",
+    dnsRecords: "رکوردهای DNS", add: "افزودن", domain: "دامنه", status: "وضعیت",
+    plan: "پلن", nameservers: "نیم‌سرورها", id: "شناسه", manageDns: "مدیریت DNS",
+    records: "رکورد", all: "همه", noRecords: "رکوردی یافت نشد",
+    noRecordsDesc: "هنوز رکوردی اضافه نشده", addRecord: "افزودن رکورد",
+    type: "نوع", name: "نام", content: "محتوا", proxy: "پروکسی", ttl: "TTL",
+    actions: "عملیات", on: "فعال", off: "خاموش", auto: "خودکار", save: "ذخیره",
+    cancel: "انصراف", editRecord: "ویرایش رکورد", deleteRecord: "حذف رکورد",
+    deleteConfirm: "آیا از حذف اطمینان دارید؟", deleteWarn: "قابل بازگشت نیست!",
+    delete: "حذف", created: "رکورد ایجاد شد!", updated: "بروزرسانی شد!", deleted: "حذف شد!",
+    proxyLabel: "پروکسی Cloudflare (ابر نارنجی)", priority: "اولویت",
+    min1: "۱ دقیقه", min5: "۵ دقیقه", hour1: "۱ ساعت", day1: "۱ روز",
+    loading: "در حال بارگذاری...", noZones: "دامنه‌ای یافت نشد", disconnected: "خارج شدید",
+    and: "و", more: "دیگر", refresh: "بروزرسانی",
+    footer: 'ساخته شده با ♡ توسط <a href="https://t.me/SchmitzWS" target="_blank">شمیتز</a>',
+    active: "فعال", pending: "در انتظار", moved: "منتقل شده",
+    recType: "نوع رکورد", recName: "نام", recContent: "محتوا",
+    rootHint: "برای ریشه دامنه @ بگذارید",
+    ipv4ph: "1.2.3.4", ipv6ph: "2001:db8::1", cnamePh: "example.com",
+    mxPh: "mail.example.com", txtPh: "v=spf1 ...", nsPh: "ns1.example.com",
+    srvPh: "priority weight port target", caaPh: '0 issue "letsencrypt.org"'
+  }
+};
+function t(k){return T[L][k]||T['en'][k]||k}
+
+function setLang(lang){
+  L=lang;localStorage.setItem('ef_lang',L);
+  document.documentElement.lang=L==='fa'?'fa':'en';
+  document.documentElement.dir=L==='fa'?'rtl':'ltr';
+  document.body.classList.toggle('rtl',L==='fa');
+  // Update static texts
+  $('loginSubtitle').textContent=t('subtitle');
+  $('lAuthLabel').textContent=t('authLabel');
+  $('optToken').textContent=t('optToken');
+  $('optApikey').textContent=t('optApikey');
+  $('loginBtn').textContent=t('signIn');
+  $('keyHint').textContent=t('tokenHint');
+  $('logoutTxt').textContent=t('logout');
+  $('tabOverview').textContent=t('overview');
+  $('cardInfoTitle').textContent=t('domainInfo');
+  $('cardDnsTitle').textContent=t('dnsRecords');
+  $('btnAddTxt').textContent=t('add');
+  $('loginFooter').innerHTML=t('footer');
+  $('appFooter').innerHTML=t('footer');
+  $('langToggle').textContent=L==='en'?'فا':'EN';
+  $('langEn').style.fontWeight=L==='en'?'700':'400';
+  $('langFa').style.fontWeight=L==='fa'?'700':'400';
+  onAuthChange();
+  if(S.zone){renderInfo();if(S.dns.length)renderTable()}
+}
+
+/* ══════ STATE ══════ */
+var S={token:'',email:'',auth:'token',zones:[],zone:null,dns:[],tab:'overview',filter:''};
+var $=function(id){return document.getElementById(id)};
+
+function hdrs(){
+  var h={"Content-Type":"application/json"};
+  if(S.auth==='token')h["X-CF-Token"]=S.token;
+  else{h["X-CF-Email"]=S.email;h["X-CF-Key"]=S.token}
+  return h;
+}
+function cf(path,opt){
+  opt=opt||{};var url=PROXY+path;var h=hdrs();
+  if(opt.headers){for(var k in opt.headers)h[k]=opt.headers[k]}
+  opt.headers=h;
+  return fetch(url,opt).then(function(r){return r.json()}).then(function(d){
+    if(!d.success)throw new Error((d.errors||[]).map(function(e){return e.message}).join(', ')||'Unknown');return d});
+}
+function showL(){$('lbar').style.display='block'}
+function hideL(){$('lbar').style.display='none'}
+function toast(m,tp){tp=tp||'nfo';var e=$('toast');e.textContent=m;e.className='toast '+tp+' show';setTimeout(function(){e.classList.remove('show')},3000)}
+function openMo(h){$('moBody').innerHTML=h;$('moBg').classList.add('open')}
+function closeMo(){$('moBg').classList.remove('open')}
+function switchTab(tab){S.tab=tab;document.querySelectorAll('.nav-tab').forEach(function(n){n.classList.toggle('active',n.dataset.tab===tab)});document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active')});$('view'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active')}
+
+function onAuthChange(){
+  var m=$('authMethod').value;
+  $('emailGrp').style.display=m==='apikey'?'block':'none';
+  if(m==='token'){$('keyLbl').textContent=t('tokenLabel');$('loginKey').placeholder=t('tokenPh')}
+  else{$('keyLbl').textContent=t('keyLabel');$('loginKey').placeholder=t('keyPh')}
+  if($('lEmailLabel'))$('lEmailLabel').textContent=t('emailLabel');
+}
+function doLogin(){
+  var method=$('authMethod').value,key=$('loginKey').value.trim(),email=$('loginEmail').value.trim();
+  if(!key){showErr(t('errToken'));return}
+  if(method==='apikey'&&!email){showErr(t('errEmail'));return}
+  S.auth=method;S.token=key;S.email=email;
+  $('loginBtn').disabled=true;$('loginBtn').textContent=t('checking');$('loginErr').style.display='none';
+  var path=method==='token'?'/user/tokens/verify':'/zones?per_page=1';
+  cf(path).then(function(){localStorage.setItem('cf_auth',JSON.stringify({auth:S.auth,token:S.token,email:S.email}));enterApp()})
+  .catch(function(e){showErr(t('error')+': '+e.message)})
+  .finally(function(){$('loginBtn').disabled=false;$('loginBtn').textContent=t('signIn')});
+}
+function showErr(m){var e=$('loginErr');e.textContent=m;e.style.display='block'}
+function doLogout(){S.token='';S.email='';S.zones=[];S.zone=null;S.dns=[];localStorage.removeItem('cf_auth');$('mainApp').style.display='none';$('loginScreen').style.display='flex';$('loginKey').value='';$('loginEmail').value='';toast(t('disconnected'),'nfo')}
+function enterApp(){$('loginScreen').style.display='none';$('mainApp').style.display='block';loadApp()}
+
+function loadApp(){showL();var all=[],p=1;function lp(){cf('/zones?per_page=50&page='+p).then(function(d){all=all.concat(d.result);var tp=(d.result_info&&d.result_info.total_pages)||1;if(p<tp){p++;lp()}else{S.zones=all;renderZoneDd();if(all.length>0){var params=new URLSearchParams(location.search);var pre=params.get('zone');var idx=-1;if(pre)for(var i=0;i<all.length;i++){if(all[i].id===pre){idx=i;break}}if(idx<0)idx=0;$('zoneDd').selectedIndex=idx;selectZone(all[idx])}$('zoneSel').style.display='flex';$('navTabs').style.display='flex';hideL()}}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()})}lp()}
+
+function renderZoneDd(){var dd=$('zoneDd');dd.innerHTML='';S.zones.forEach(function(z){var st=z.status==='active'?'🟢':z.status==='pending'?'🟡':'🔴';var o=document.createElement('option');o.value=z.id;o.textContent=st+' '+z.name+' — '+(z.plan&&z.plan.name||'Free');dd.appendChild(o)})}
+function onZoneChange(){var z=S.zones.find(function(x){return x.id===$('zoneDd').value});if(z)selectZone(z)}
+function selectZone(z){S.zone=z;renderInfo();loadDNS()}
+
+function renderInfo(){
+  var z=S.zone;if(!z)return;
+  var sm={active:[t('active'),'active'],pending:[t('pending'),'pending'],moved:[t('moved'),'inactive']};
+  var pair=sm[z.status]||[z.status,'inactive'];
+  var ns=(z.name_servers||[]).map(function(n){return'<code style="font-size:12px">'+n+'</code>'}).join('<br>')||'—';
+  $('zoneInfo').innerHTML='<div class="irow"><span class="ilbl">'+t('domain')+'</span><span class="ival">'+z.name+'</span></div><div class="irow"><span class="ilbl">'+t('status')+'</span><span><span class="st '+pair[1]+'"><span class="st-dot"></span>'+pair[0]+'</span></span></div><div class="irow"><span class="ilbl">'+t('plan')+'</span><span class="ival">'+(z.plan&&z.plan.name||'Free')+'</span></div><div class="irow"><span class="ilbl">'+t('nameservers')+'</span><span class="ival">'+ns+'</span></div><div class="irow"><span class="ilbl">'+t('id')+'</span><span class="ival" style="font-size:11px">'+z.id+'</span></div><div class="mt-16"><button class="btn btn-pri" onclick="switchTab(\'dns\')">'+t('manageDns')+'</button></div>';
+}
+
+function loadDNS(){if(!S.zone)return;showL();var all=[],p=1;function lp(){cf('/zones/'+S.zone.id+'/dns_records?per_page=100&page='+p).then(function(d){all=all.concat(d.result);var tp=(d.result_info&&d.result_info.total_pages)||1;if(p<tp){p++;lp()}else{S.dns=all;$('dnsCount').textContent=all.length;renderFilters();renderTable();hideL()}}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()})}lp()}
+function renderFilters(){var tc={};S.dns.forEach(function(r){tc[r.type]=(tc[r.type]||0)+1});var h='<div class="f-pills"><button class="f-pill '+(S.filter===''?'active':'')+'" onclick="setF(\'\')">'+t('all')+' ('+S.dns.length+')</button>';Object.keys(tc).sort().forEach(function(tp){h+='<button class="f-pill '+(S.filter===tp?'active':'')+'" onclick="setF(\''+tp+'\')">'+tp+' ('+tc[tp]+')</button>'});h+='</div>';$('dnsFilters').innerHTML=h}
+function setF(tp){S.filter=tp;renderFilters();renderTable()}
+
+function renderTable(){
+  var recs=S.filter?S.dns.filter(function(r){return r.type===S.filter}):S.dns;
+  if(!recs.length){$('dnsArea').innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/></svg><h3>'+t('noRecords')+'</h3><p>'+t('noRecordsDesc')+'</p><button class="btn btn-pri" onclick="openAddModal()">'+t('addRecord')+'</button></div>';return}
+  var h='<table class="dns-table"><thead><tr><th>'+t('type')+'</th><th>'+t('name')+'</th><th>'+t('content')+'</th><th>'+t('proxy')+'</th><th>'+t('ttl')+'</th><th>'+t('actions')+'</th></tr></thead><tbody>';
+  recs.forEach(function(r){var px=r.proxied?'<span class="px-icon on"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>'+t('on')+'</span>':'<span class="px-icon off"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>'+t('off')+'</span>';var ttl=r.ttl===1?t('auto'):(r.ttl>=3600?Math.floor(r.ttl/3600)+'h':r.ttl+'s');var nm=r.name.replace('.'+S.zone.name,'')||'@';var ct=r.content.length>45?r.content.substring(0,45)+'…':r.content;var canPx=['A','AAAA','CNAME'].indexOf(r.type)!==-1;
+  h+='<tr><td><span class="tbadge '+r.type+'">'+r.type+'</span></td><td><span class="n-cell">'+nm+'</span></td><td><span class="c-cell" title="'+r.content+'">'+ct+'</span></td><td>'+(canPx?px:'—')+'</td><td><span class="t-cell">'+ttl+'</span></td><td><div class="a-cell"><button class="abtn" onclick="openEditMo(\''+r.id+'\')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="abtn danger" onclick="confirmDel(\''+r.id+"','"+r.name.replace(/'/g,"\\'")+'\')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div></td></tr>'});
+  h+='</tbody></table>';$('dnsArea').innerHTML=h;
+}
+
+function openAddModal(){
+  var phs={A:t('ipv4ph'),AAAA:t('ipv6ph'),CNAME:t('cnamePh'),MX:t('mxPh'),TXT:t('txtPh'),NS:t('nsPh'),SRV:t('srvPh'),CAA:t('caaPh')};
+  openMo('<div class="mo-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cf-blue-600)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'+t('addRecord')+'</div><div class="fg"><label class="fl">'+t('recType')+'</label><select class="fs" id="aType" onchange="onATC()"><option value="A">A</option><option value="AAAA">AAAA</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="TXT">TXT</option><option value="NS">NS</option><option value="SRV">SRV</option><option value="CAA">CAA</option></select></div><div class="fg"><label class="fl">'+t('recName')+'</label><input class="fi" id="aName" value="@" placeholder="@"/><div class="fh">'+t('rootHint')+' — .'+S.zone.name+'</div></div><div class="fg"><label class="fl">'+t('recContent')+'</label><input class="fi" id="aCont" placeholder="'+phs.A+'"/></div><div class="fg" id="aPriGrp" style="display:none"><label class="fl">'+t('priority')+'</label><input class="fi" id="aPri" type="number" value="10"/></div><div class="fg"><label class="fl">TTL</label><select class="fs" id="aTTL"><option value="1">'+t('auto')+'</option><option value="60">'+t('min1')+'</option><option value="300">'+t('min5')+'</option><option value="3600">'+t('hour1')+'</option><option value="86400">'+t('day1')+'</option></select></div><div class="fg" id="aPxGrp"><div class="ftg" onclick="tgl(\'aPx\')"><div class="tg-track on" id="aPxT"><div class="tg-knob"></div></div><span class="tg-label">'+t('proxyLabel')+'</span></div><input type="hidden" id="aPx" value="true"/></div><div class="btn-group mt-16"><button class="btn btn-pri" onclick="submitAdd()" style="flex:1">'+t('save')+'</button><button class="btn btn-out" onclick="closeMo()">'+t('cancel')+'</button></div>');
+}
+function onATC(){var tp=$('aType')?$('aType').value:'';if(!tp)return;var pg=$('aPriGrp'),pxg=$('aPxGrp'),ci=$('aCont');if(pg)pg.style.display=['MX','SRV'].indexOf(tp)!==-1?'block':'none';if(pxg)pxg.style.display=['A','AAAA','CNAME'].indexOf(tp)!==-1?'block':'none';var phs={A:t('ipv4ph'),AAAA:t('ipv6ph'),CNAME:t('cnamePh'),MX:t('mxPh'),TXT:t('txtPh'),NS:t('nsPh'),SRV:t('srvPh'),CAA:t('caaPh')};if(ci)ci.placeholder=phs[tp]||''}
+function tgl(id){var i=$(id),tr=$(id+'T');var on=i.value==='true';i.value=on?'false':'true';tr.classList.toggle('on',!on)}
+function submitAdd(){var type=$('aType').value;var name=$('aName').value.trim();var content=$('aCont').value.trim();var ttl=parseInt($('aTTL').value);var proxied=$('aPx')?$('aPx').value==='true':false;var priority=parseInt($('aPri')?$('aPri').value:'10')||10;if(!content){toast(t('errToken'),'err');return}if(name==='@')name=S.zone.name;else if(name.indexOf(S.zone.name)===-1)name=name+'.'+S.zone.name;var body={type:type,name:name,content:content,ttl:ttl};if(['A','AAAA','CNAME'].indexOf(type)!==-1)body.proxied=proxied;if(['MX','SRV'].indexOf(type)!==-1)body.priority=priority;closeMo();showL();cf('/zones/'+S.zone.id+'/dns_records',{method:'POST',body:JSON.stringify(body)}).then(function(){toast(t('created'),'ok');loadDNS()}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()})}
+
+function openEditMo(id){var r=S.dns.find(function(x){return x.id===id});if(!r)return;var ip=['A','AAAA','CNAME'].indexOf(r.type)!==-1;var hp=['MX','SRV'].indexOf(r.type)!==-1;var h='<div class="mo-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cf-blue-600)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'+t('editRecord')+' '+r.type+'</div>';h+='<div class="fg"><label class="fl">'+t('type')+'</label><input class="fi" value="'+r.type+'" disabled/></div>';h+='<div class="fg"><label class="fl">'+t('name')+'</label><input class="fi" id="eName" value="'+r.name+'"/></div>';h+='<div class="fg"><label class="fl">'+t('content')+'</label><input class="fi" id="eCont" value="'+r.content+'"/></div>';if(hp)h+='<div class="fg"><label class="fl">'+t('priority')+'</label><input class="fi" id="ePri" type="number" value="'+(r.priority||10)+'"/></div>';h+='<div class="fg"><label class="fl">TTL</label><select class="fs" id="eTTL"><option value="1" '+(r.ttl===1?'selected':'')+'>'+t('auto')+'</option><option value="300" '+(r.ttl===300?'selected':'')+'>'+t('min5')+'</option><option value="3600" '+(r.ttl===3600?'selected':'')+'>'+t('hour1')+'</option><option value="86400" '+(r.ttl===86400?'selected':'')+'>'+t('day1')+'</option></select></div>';if(ip)h+='<div class="fg"><div class="ftg" onclick="tgl(\'ePx\')"><div class="tg-track '+(r.proxied?'on':'')+'" id="ePxT"><div class="tg-knob"></div></div><span class="tg-label">'+t('proxyLabel')+'</span></div><input type="hidden" id="ePx" value="'+r.proxied+'"/></div>';h+='<div class="btn-group mt-16"><button class="btn btn-pri" onclick="submitEdit(\''+id+"','"+r.type+'\')" style="flex:1">'+t('save')+'</button><button class="btn btn-out" onclick="closeMo()">'+t('cancel')+'</button></div>';openMo(h)}
+function submitEdit(id,type){var name=$('eName').value.trim(),content=$('eCont').value.trim(),ttl=parseInt($('eTTL').value);var proxied=$('ePx')?$('ePx').value==='true':false;var priority=$('ePri')?parseInt($('ePri').value):undefined;if(!content){toast(t('errToken'),'err');return}var body={type:type,name:name,content:content,ttl:ttl};if(['A','AAAA','CNAME'].indexOf(type)!==-1)body.proxied=proxied;if(priority!==undefined)body.priority=priority;closeMo();showL();cf('/zones/'+S.zone.id+'/dns_records/'+id,{method:'PUT',body:JSON.stringify(body)}).then(function(){toast(t('updated'),'ok');loadDNS()}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()})}
+function confirmDel(id,name){openMo('<div class="mo-title" style="color:var(--cf-red)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'+t('deleteRecord')+'</div><p style="font-size:14px;color:var(--g600);margin-bottom:8px">'+t('deleteConfirm')+'</p><div style="background:var(--g50);border-radius:8px;padding:12px;margin-bottom:16px;direction:ltr;text-align:left;font-family:monospace;font-size:13px">'+name+'</div><p style="font-size:12px;color:var(--cf-red);margin-bottom:16px">⚠️ '+t('deleteWarn')+'</p><div class="btn-group"><button class="btn btn-dng" onclick="doDel(\''+id+'\')" style="flex:1">'+t('delete')+'</button><button class="btn btn-out" onclick="closeMo()">'+t('cancel')+'</button></div>')}
+function doDel(id){closeMo();showL();cf('/zones/'+S.zone.id+'/dns_records/'+id,{method:'DELETE'}).then(function(){toast(t('deleted'),'ok');loadDNS()}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()})}
+function refreshView(){if(S.tab==='dns')loadDNS();else if(S.zone)selectZone(S.zone)}
+
+/* ══════ INIT ══════ */
+try{if(window.Telegram&&window.Telegram.WebApp){var tg=window.Telegram.WebApp;tg.ready();tg.expand();tg.MainButton.hide()}}catch(e){}
+setLang(L);
+var saved=localStorage.getItem('cf_auth');
+if(saved){try{var d=JSON.parse(saved);S.auth=d.auth;S.token=d.token;S.email=d.email;var vp=S.auth==='token'?'/user/tokens/verify':'/zones?per_page=1';cf(vp).then(function(){enterApp()}).catch(function(){S.token='';S.email='';localStorage.removeItem('cf_auth');$('loginScreen').style.display='flex';$('mainApp').style.display='none'})}catch(e){localStorage.removeItem('cf_auth')}}
+</script>
+</body>
+</html>
