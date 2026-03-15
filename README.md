@@ -1,4 +1,4 @@
-<![CDATA[<p align="center">
+<p align="center">
   <img src="web/logo.png" alt="EazyFlare" width="120">
 </p>
 
@@ -33,6 +33,8 @@ EazyFlare lets you manage your Cloudflare account directly from Telegram — thr
 | 👷 **Workers** | List scripts & routes, view code, edit & publish, upload new, delete |
 | 📧 **Email Routing** | View status, enable/disable, list routing rules |
 | 📊 **Mini App** | Full dashboard with all features above, Cloudflare-like UI |
+| 🚀 **Deploy** | Install your own bot on any server via SSH, directly from the bot or mini app |
+| 🐳 **Docker** | One-command deploy with Docker Compose |
 | 🌍 **Bilingual** | English and Persian (Farsi) with instant switching |
 | 🛡️ **Security** | Auto-delete token messages, forced IPv4 |
 
@@ -127,6 +129,7 @@ systemctl start eazyflare
 | `/domains` | List your domains |
 | `/dns` | Manage DNS records |
 | `/disconnect` | Disconnect account |
+| `/deploy` | Deploy your own bot on a server |
 | `/help` | Help & guide |
 
 ### Getting a Cloudflare API Token
@@ -179,6 +182,8 @@ EazyFlare ابزاری برای مدیریت کامل حساب کلادفلر م
 | 👷 **Workers** | لیست اسکریپت‌ها و Route‌ها، مشاهده کد، ادیت و پابلیش، آپلود جدید، حذف |
 | 📧 **مسیریابی ایمیل** | مشاهده وضعیت، فعال/غیرفعال، لیست قوانین |
 | 📊 **مینی‌اپ** | داشبورد کامل با تمام امکانات بالا |
+| 🚀 **نصب از راه دور** | نصب ربات شخصی روی هر سروری از طریق SSH، مستقیم از ربات یا مینی‌اپ |
+| 🐳 **داکر** | نصب با یک دستور با Docker Compose |
 | 🌍 **دوزبانه** | انگلیسی و فارسی با تغییر آنی |
 | 🛡️ **امنیت** | حذف خودکار پیام‌های حاوی توکن، اجبار IPv4 |
 
@@ -231,6 +236,7 @@ python3 bot.py
 | `/domains` | لیست دامنه‌ها |
 | `/dns` | مدیریت DNS |
 | `/disconnect` | قطع اتصال |
+| `/deploy` | نصب ربات شخصی روی سرور |
 | `/help` | راهنما |
 
 ### ساخت API Token کلادفلر
@@ -265,4 +271,3 @@ python3 bot.py
 ---
 
 Made with ♡ by [Schmitz](https://t.me/SchmitzWS)
-]]>
