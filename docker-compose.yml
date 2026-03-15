@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  eazyflare:
+    build: .
+    container_name: eazyflare
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./users.json:/app/users.json
