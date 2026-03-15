@@ -1,1484 +1,851 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Cloudflare Dashboard</title>
+<title>EazyFlare Dashboard</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════ CLOUDFLARE DESIGN SYSTEM ═══════════════ */
-:root {
-  --cf-blue-900: #0a1628;
-  --cf-blue-800: #0d2137;
-  --cf-blue-700: #003681;
-  --cf-blue-600: #0051a3;
-  --cf-blue-500: #1166c5;
-  --cf-blue-400: #4693e8;
-  --cf-blue-100: #e0ecfc;
-  --cf-blue-50: #f0f6ff;
-  --cf-orange: #f6821f;
-  --cf-orange-hover: #e5750e;
-  --cf-orange-soft: #fff5eb;
-  --cf-green: #2fa85d;
-  --cf-green-soft: #eefaf3;
-  --cf-red: #d63e3e;
-  --cf-red-soft: #fcedee;
-  --cf-yellow: #e4a11b;
-  --cf-yellow-soft: #fef9ec;
-  --cf-gray-900: #1a1a1a;
-  --cf-gray-800: #2c2c2c;
-  --cf-gray-700: #404040;
-  --cf-gray-600: #555;
-  --cf-gray-500: #737373;
-  --cf-gray-400: #a0a0a0;
-  --cf-gray-300: #c5c5c5;
-  --cf-gray-200: #e5e5e5;
-  --cf-gray-100: #f3f3f3;
-  --cf-gray-50: #fafafa;
-  --cf-white: #ffffff;
-  --cf-shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
-  --cf-shadow-md: 0 2px 8px rgba(0,0,0,0.08);
-  --cf-shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
-  --cf-radius: 8px;
-  --cf-radius-lg: 12px;
-}
-
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--cf-gray-100);
-  color: var(--cf-gray-900);
-  -webkit-tap-highlight-color: transparent;
-  min-height: 100vh;
-}
-
-/* ═══════════ TOP BAR ═══════════ */
-.topbar {
-  background: var(--cf-blue-900);
-  padding: 0 16px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.topbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.topbar-logo {
-  width: 28px; height: 28px;
-}
-
-.topbar-logo svg {
-  width: 100%; height: 100%;
-}
-
-.topbar-title {
-  color: white;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-}
-
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.topbar-btn {
-  background: rgba(255,255,255,0.1);
-  border: none;
-  color: rgba(255,255,255,0.8);
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.topbar-btn:hover {
-  background: rgba(255,255,255,0.2);
-  color: white;
-}
-.topbar-btn svg { width: 18px; height: 18px; }
-
-.topbar-user {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: rgba(255,255,255,0.8);
-  font-size: 12px;
-  padding: 4px 10px 4px 4px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.08);
-}
-
-.topbar-avatar {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--cf-orange), #e27625);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 800;
-  color: white;
-}
-
-/* ═══════════ NAV TABS ═══════════ */
-.nav-tabs {
-  background: var(--cf-white);
-  border-bottom: 1px solid var(--cf-gray-200);
-  display: flex;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.nav-tabs::-webkit-scrollbar { display: none; }
-
-.nav-tab {
-  padding: 12px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--cf-gray-500);
-  border: none;
-  background: none;
-  cursor: pointer;
-  white-space: nowrap;
-  border-bottom: 2px solid transparent;
-  transition: all 0.15s;
-  font-family: 'Vazirmatn', sans-serif;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.nav-tab:hover {
-  color: var(--cf-gray-700);
-}
-.nav-tab.active {
-  color: var(--cf-blue-600);
-  border-bottom-color: var(--cf-blue-600);
-  font-weight: 600;
-}
-.nav-tab svg {
-  width: 16px; height: 16px;
-}
-
-.nav-badge {
-  font-size: 10px;
-  background: var(--cf-blue-100);
-  color: var(--cf-blue-700);
-  padding: 1px 6px;
-  border-radius: 10px;
-  font-weight: 700;
-}
-
-/* ═══════════ CONTENT ═══════════ */
-.content {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 16px;
-}
-
-/* ═══════════ CARDS ═══════════ */
-.card {
-  background: var(--cf-white);
-  border: 1px solid var(--cf-gray-200);
-  border-radius: var(--cf-radius-lg);
-  box-shadow: var(--cf-shadow-sm);
-  margin-bottom: 16px;
-  overflow: hidden;
-}
-
-.card-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--cf-gray-100);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.card-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--cf-gray-900);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.card-title svg { width: 18px; height: 18px; color: var(--cf-blue-600); }
-
-.card-body {
-  padding: 20px;
-}
-
-.card-body.compact {
-  padding: 0;
-}
-
-/* ═══════════ LOGIN SCREEN ═══════════ */
-.login-screen {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: linear-gradient(180deg, var(--cf-blue-900) 0%, var(--cf-blue-800) 40%, var(--cf-gray-100) 40%);
-}
-
-.login-card {
-  background: var(--cf-white);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-  width: 100%;
-  max-width: 400px;
-  padding: 32px 28px;
-  position: relative;
-}
-
-.login-logo {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.login-logo svg {
-  width: 48px;
-  height: 48px;
-}
-
-.login-logo h2 {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--cf-gray-900);
-  margin-top: 12px;
-}
-
-.login-logo p {
-  font-size: 13px;
-  color: var(--cf-gray-500);
-  margin-top: 4px;
-}
-
-/* ═══════════ FORM ELEMENTS ═══════════ */
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--cf-gray-700);
-  margin-bottom: 6px;
-}
-
-.form-input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--cf-gray-300);
-  border-radius: var(--cf-radius);
-  font-family: 'Vazirmatn', sans-serif;
-  font-size: 14px;
-  color: var(--cf-gray-900);
-  background: var(--cf-white);
-  outline: none;
-  transition: all 0.15s;
-  direction: ltr;
-  text-align: left;
-}
-.form-input:focus {
-  border-color: var(--cf-blue-500);
-  box-shadow: 0 0 0 3px rgba(17,102,197,0.15);
-}
-.form-input::placeholder {
-  color: var(--cf-gray-400);
-}
-
-.form-select {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--cf-gray-300);
-  border-radius: var(--cf-radius);
-  font-family: 'Vazirmatn', sans-serif;
-  font-size: 14px;
-  color: var(--cf-gray-900);
-  background: var(--cf-white);
-  outline: none;
-  cursor: pointer;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: 12px center;
-  padding-left: 32px;
-}
-.form-select:focus {
-  border-color: var(--cf-blue-500);
-  box-shadow: 0 0 0 3px rgba(17,102,197,0.15);
-}
-
-.form-hint {
-  font-size: 11px;
-  color: var(--cf-gray-500);
-  margin-top: 4px;
-}
-
-.form-toggle {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.toggle-track {
-  width: 40px;
-  height: 22px;
-  background: var(--cf-gray-300);
-  border-radius: 11px;
-  position: relative;
-  transition: background 0.2s;
-  flex-shrink: 0;
-}
-.toggle-track.on {
-  background: var(--cf-orange);
-}
-
-.toggle-handle {
-  width: 18px;
-  height: 18px;
-  background: white;
-  border-radius: 50%;
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  transition: right 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-.toggle-track.on .toggle-handle {
-  right: 20px;
-}
-
-.toggle-label {
-  font-size: 13px;
-  color: var(--cf-gray-700);
-}
-
-/* ═══════════ BUTTONS ═══════════ */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 9px 18px;
-  border-radius: var(--cf-radius);
-  font-family: 'Vazirmatn', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: 1px solid transparent;
-  white-space: nowrap;
-}
-.btn svg { width: 16px; height: 16px; }
-
-.btn-primary {
-  background: var(--cf-blue-600);
-  color: white;
-}
-.btn-primary:hover {
-  background: var(--cf-blue-700);
-  box-shadow: 0 2px 8px rgba(0,54,129,0.25);
-}
-
-.btn-orange {
-  background: var(--cf-orange);
-  color: white;
-}
-.btn-orange:hover {
-  background: var(--cf-orange-hover);
-  box-shadow: 0 2px 8px rgba(246,130,31,0.3);
-}
-
-.btn-outline {
-  background: var(--cf-white);
-  color: var(--cf-gray-700);
-  border: 1px solid var(--cf-gray-300);
-}
-.btn-outline:hover {
-  background: var(--cf-gray-50);
-  border-color: var(--cf-gray-400);
-}
-
-.btn-danger {
-  background: var(--cf-red);
-  color: white;
-}
-.btn-danger:hover {
-  background: #c53030;
-}
-
-.btn-ghost {
-  background: transparent;
-  color: var(--cf-blue-600);
-  border: none;
-  padding: 6px 10px;
-}
-.btn-ghost:hover {
-  background: var(--cf-blue-50);
-}
-
-.btn-sm {
-  padding: 5px 12px;
-  font-size: 12px;
-}
-
-.btn-block {
-  width: 100%;
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-group {
-  display: flex;
-  gap: 8px;
-}
-
-/* ═══════════ TABLE ═══════════ */
-.dns-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.dns-table thead th {
-  padding: 10px 16px;
-  text-align: right;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--cf-gray-500);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  background: var(--cf-gray-50);
-  border-bottom: 1px solid var(--cf-gray-200);
-}
-.dns-table thead th.ltr {
-  text-align: left;
-}
-
-.dns-table tbody tr {
-  border-bottom: 1px solid var(--cf-gray-100);
-  transition: background 0.1s;
-}
-.dns-table tbody tr:hover {
-  background: var(--cf-blue-50);
-}
-.dns-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.dns-table tbody td {
-  padding: 12px 16px;
-  font-size: 13px;
-  vertical-align: middle;
-}
-
-.dns-table .ltr {
-  direction: ltr;
-  text-align: left;
-}
-
-.type-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  font-family: 'Courier New', monospace;
-  letter-spacing: 0.5px;
-}
-.type-badge.A     { background: #e0ecfc; color: #003681; }
-.type-badge.AAAA  { background: #ede9fe; color: #5b21b6; }
-.type-badge.CNAME { background: #eefaf3; color: #166534; }
-.type-badge.MX    { background: #fef9ec; color: #92400e; }
-.type-badge.TXT   { background: #fce7f3; color: #9d174d; }
-.type-badge.NS    { background: #e0f2fe; color: #075985; }
-.type-badge.SRV   { background: #fff7ed; color: #9a3412; }
-.type-badge.CAA   { background: #f3e8ff; color: #6b21a8; }
-
-.proxy-icon {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-}
-.proxy-icon.on  { color: var(--cf-orange); }
-.proxy-icon.off { color: var(--cf-gray-400); }
-.proxy-icon svg { width: 16px; height: 16px; }
-
-.name-cell {
-  font-weight: 600;
-  color: var(--cf-gray-900);
-  word-break: break-all;
-  font-family: 'SF Mono', 'Courier New', monospace;
-  font-size: 12px;
-}
-
-.content-cell {
-  color: var(--cf-gray-600);
-  word-break: break-all;
-  font-family: 'SF Mono', 'Courier New', monospace;
-  font-size: 12px;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ttl-cell {
-  font-size: 12px;
-  color: var(--cf-gray-500);
-}
-
-.actions-cell {
-  display: flex;
-  gap: 4px;
-  justify-content: flex-start;
-}
-
-.action-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
-  border: 1px solid var(--cf-gray-200);
-  background: white;
-  color: var(--cf-gray-500);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.action-btn svg { width: 14px; height: 14px; }
-.action-btn:hover {
-  background: var(--cf-gray-50);
-  color: var(--cf-gray-700);
-  border-color: var(--cf-gray-300);
-}
-.action-btn.danger:hover {
-  background: var(--cf-red-soft);
-  color: var(--cf-red);
-  border-color: var(--cf-red);
-}
-
-/* ═══════════ STATUS BADGES ═══════════ */
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 12px;
-}
-.status.active   { background: var(--cf-green-soft); color: var(--cf-green); }
-.status.pending  { background: var(--cf-yellow-soft); color: var(--cf-yellow); }
-.status.inactive { background: var(--cf-red-soft); color: var(--cf-red); }
-.status-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-/* ═══════════ ZONE SELECTOR ═══════════ */
-.zone-selector {
-  background: var(--cf-white);
-  border-bottom: 1px solid var(--cf-gray-200);
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.zone-select-dropdown {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid var(--cf-gray-300);
-  border-radius: var(--cf-radius);
-  font-family: 'Vazirmatn', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  background: var(--cf-white);
-  color: var(--cf-gray-900);
-  cursor: pointer;
-  outline: none;
-  direction: ltr;
-}
-.zone-select-dropdown:focus {
-  border-color: var(--cf-blue-500);
-}
-
-/* ═══════════ MODAL ═══════════ */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 100;
-  display: none;
-  align-items: flex-end;
-  justify-content: center;
-}
-.modal-backdrop.open {
-  display: flex;
-}
-
-.modal-sheet {
-  background: var(--cf-white);
-  border-radius: 16px 16px 0 0;
-  width: 100%;
-  max-width: 500px;
-  max-height: 85vh;
-  overflow-y: auto;
-  padding: 24px 20px;
-  animation: sheetUp 0.3s cubic-bezier(0.22,1,0.36,1);
-}
-@keyframes sheetUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
-.modal-handle {
-  width: 36px;
-  height: 4px;
-  background: var(--cf-gray-300);
-  border-radius: 2px;
-  margin: 0 auto 16px;
-}
-
-.modal-title {
-  font-size: 17px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* ═══════════ TOAST ═══════════ */
-.toast {
-  position: fixed;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-80px);
-  padding: 10px 20px;
-  border-radius: var(--cf-radius);
-  font-size: 13px;
-  font-weight: 600;
-  z-index: 200;
-  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
-  box-shadow: var(--cf-shadow-lg);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'Vazirmatn', sans-serif;
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
-.toast.success { background: var(--cf-green); color: white; }
-.toast.error   { background: var(--cf-red); color: white; }
-.toast.info    { background: var(--cf-blue-600); color: white; }
-
-/* ═══════════ LOADING ═══════════ */
-.loading-bar {
-  height: 3px;
-  background: var(--cf-gray-200);
-  position: relative;
-  overflow: hidden;
-}
-.loading-bar::after {
-  content: '';
-  position: absolute;
-  top: 0; left: -40%;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, var(--cf-orange), transparent);
-  animation: loadSlide 1.2s infinite;
-}
-@keyframes loadSlide {
-  0% { left: -40%; }
-  100% { left: 100%; }
-}
-
-.skeleton {
-  background: linear-gradient(90deg, var(--cf-gray-100) 25%, var(--cf-gray-200) 50%, var(--cf-gray-100) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 4px;
-}
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* ═══════════ EMPTY STATE ═══════════ */
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-}
-.empty-state svg {
-  width: 56px; height: 56px;
-  color: var(--cf-gray-300);
-  margin-bottom: 16px;
-}
-.empty-state h3 {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--cf-gray-700);
-  margin-bottom: 4px;
-}
-.empty-state p {
-  font-size: 13px;
-  color: var(--cf-gray-500);
-  margin-bottom: 16px;
-}
-
-/* ═══════════ RESPONSIVE ═══════════ */
-@media (max-width: 600px) {
-  .dns-table thead { display: none; }
-  .dns-table tbody tr {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 12px 16px;
-    gap: 6px;
-    align-items: center;
-  }
-  .dns-table tbody td {
-    padding: 0;
-    border: none;
-  }
-  .dns-table tbody td:nth-child(1) { order: 1; }
-  .dns-table tbody td:nth-child(2) { order: 2; flex: 1; }
-  .dns-table tbody td:nth-child(3) { order: 4; width: 100%; }
-  .dns-table tbody td:nth-child(4) { order: 5; }
-  .dns-table tbody td:nth-child(5) { order: 3; }
-  .dns-table tbody td:nth-child(6) { order: 6; margin-right: auto; }
-  .content-cell { max-width: none; white-space: normal; }
-}
-
-/* Tab switch anim */
-.view { display: none; animation: viewIn 0.25s ease; }
-.view.active { display: block; }
-@keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-/* Misc */
-.mt-8  { margin-top: 8px; }
-.mt-16 { margin-top: 16px; }
-.mb-16 { margin-bottom: 16px; }
-.flex   { display: flex; }
-.gap-8  { gap: 8px; }
-.gap-12 { gap: 12px; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.text-sm { font-size: 13px; }
-.text-xs { font-size: 11px; }
-.text-dim { color: var(--cf-gray-500); }
-.text-mono { font-family: 'SF Mono','Courier New',monospace; font-size: 12px; direction: ltr; text-align: left; }
-.fw-600 { font-weight: 600; }
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--cf-gray-100);
-  font-size: 13px;
-}
-.info-row:last-child { border-bottom: none; }
-.info-label { color: var(--cf-gray-500); font-weight: 500; }
-.info-value { color: var(--cf-gray-900); font-weight: 600; direction: ltr; }
-
-.filter-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-.filter-pill {
-  padding: 4px 12px;
-  border-radius: 16px;
-  border: 1px solid var(--cf-gray-300);
-  background: white;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: 'Vazirmatn', sans-serif;
-  transition: all 0.15s;
-  color: var(--cf-gray-600);
-}
-.filter-pill:hover { border-color: var(--cf-blue-500); color: var(--cf-blue-600); }
-.filter-pill.active {
-  background: var(--cf-blue-600);
-  color: white;
-  border-color: var(--cf-blue-600);
-}
+:root{--cf-blue-900:#0a1628;--cf-blue-800:#0d2137;--cf-blue-700:#003681;--cf-blue-600:#0051a3;--cf-blue-500:#1166c5;--cf-blue-100:#e0ecfc;--cf-blue-50:#f0f6ff;--cf-orange:#f6821f;--cf-orange-hover:#e5750e;--cf-orange-soft:#fff5eb;--cf-green:#2fa85d;--cf-green-soft:#eefaf3;--cf-red:#d63e3e;--cf-red-soft:#fcedee;--cf-yellow:#e4a11b;--cf-yellow-soft:#fef9ec;--g900:#1a1a1a;--g700:#404040;--g600:#555;--g500:#737373;--g400:#a0a0a0;--g300:#c5c5c5;--g200:#e5e5e5;--g100:#f3f3f3;--g50:#fafafa;--white:#fff;--r:8px;--rl:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--g100);color:var(--g900);min-height:100vh;-webkit-tap-highlight-color:transparent}
+body.rtl{direction:rtl;font-family:'Vazirmatn',sans-serif}
+body.rtl .ltr{direction:ltr;text-align:left}
+
+/* Topbar */
+.topbar{background:var(--cf-blue-900);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-brand{display:flex;align-items:center;gap:10px}
+.topbar-brand img{height:28px}
+.topbar-title{color:#fff;font-size:15px;font-weight:700}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.topbar-btn{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.8);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;font-size:14px}
+.topbar-btn:hover{background:rgba(255,255,255,.2);color:#fff}
+.topbar-btn svg{width:18px;height:18px}
+.topbar-user{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.8);font-size:12px;padding:4px 10px 4px 4px;border-radius:20px;background:rgba(255,255,255,.08);cursor:pointer}
+.topbar-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--cf-orange),#e27625);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+
+/* Nav */
+.nav-tabs{background:var(--white);border-bottom:1px solid var(--g200);display:flex;overflow-x:auto;scrollbar-width:none}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{padding:12px 16px;font-size:13px;font-weight:500;color:var(--g500);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:.15s;font-family:inherit;display:flex;align-items:center;gap:6px}
+.nav-tab:hover{color:var(--g700)}.nav-tab.active{color:var(--cf-blue-600);border-bottom-color:var(--cf-blue-600);font-weight:600}
+.nav-tab svg{width:16px;height:16px}
+.nav-badge{font-size:10px;background:var(--cf-blue-100);color:var(--cf-blue-700);padding:1px 6px;border-radius:10px;font-weight:700}
+
+/* Layout */
+.content{max-width:960px;margin:0 auto;padding:16px;display:flex;flex-direction:column;min-height:calc(100vh - 160px)}
+.card{background:var(--white);border:1px solid var(--g200);border-radius:var(--rl);box-shadow:0 1px 2px rgba(0,0,0,.06);margin-bottom:16px;overflow:hidden}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.card-title svg{width:18px;height:18px;color:var(--cf-blue-600)}
+.card-body{padding:20px}.card-body.compact{padding:0}
+
+/* Login */
+.login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:linear-gradient(180deg,var(--cf-blue-900) 0%,var(--cf-blue-800) 40%,var(--g100) 40%)}
+.login-card{background:var(--white);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.12);width:100%;max-width:400px;padding:32px 28px}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo img{width:72px;height:72px;object-fit:contain}
+.login-logo h2{font-size:20px;font-weight:800;margin-top:12px}
+.login-logo p{font-size:13px;color:var(--g500);margin-top:4px}
+
+/* Forms */
+.fg{margin-bottom:16px}
+.fl{display:block;font-size:13px;font-weight:600;color:var(--g700);margin-bottom:6px}
+.fi{width:100%;padding:10px 14px;border:1px solid var(--g300);border-radius:var(--r);font-family:inherit;font-size:14px;color:var(--g900);background:var(--white);outline:none;transition:.15s;direction:ltr;text-align:left}
+.fi:focus{border-color:var(--cf-blue-500);box-shadow:0 0 0 3px rgba(17,102,197,.15)}
+.fi::placeholder{color:var(--g400)}.fi[disabled]{opacity:.5}
+.fs{width:100%;padding:10px 14px;border:1px solid var(--g300);border-radius:var(--r);font-family:inherit;font-size:14px;color:var(--g900);background:var(--white);outline:none;cursor:pointer;-webkit-appearance:none}
+.fs:focus{border-color:var(--cf-blue-500);box-shadow:0 0 0 3px rgba(17,102,197,.15)}
+.fh{font-size:11px;color:var(--g500);margin-top:4px}
+.ferr{display:none;margin-top:12px;padding:10px;border-radius:8px;background:var(--cf-red-soft);color:var(--cf-red);font-size:13px}
+
+/* Toggle */
+.ftg{display:flex;align-items:center;gap:10px;cursor:pointer}
+.tg-track{width:40px;height:22px;background:var(--g300);border-radius:11px;position:relative;transition:.2s;flex-shrink:0}
+.tg-track.on{background:var(--cf-orange)}
+.tg-knob{width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tg-track.on .tg-knob{right:20px}
+body.rtl .tg-knob{right:auto;left:2px}
+body.rtl .tg-track.on .tg-knob{left:20px;right:auto}
+.tg-label{font-size:13px;color:var(--g700)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:var(--r);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid transparent;white-space:nowrap}
+.btn svg{width:16px;height:16px}
+.btn-pri{background:var(--cf-blue-600);color:#fff}.btn-pri:hover{background:var(--cf-blue-700)}
+.btn-or{background:var(--cf-orange);color:#fff}.btn-or:hover{background:var(--cf-orange-hover)}
+.btn-out{background:var(--white);color:var(--g700);border:1px solid var(--g300)}.btn-out:hover{background:var(--g50)}
+.btn-dng{background:var(--cf-red);color:#fff}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-block{width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-group{display:flex;gap:8px}
+
+/* Table */
+.dns-table{width:100%;border-collapse:collapse}
+.dns-table thead th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;background:var(--g50);border-bottom:1px solid var(--g200)}
+body.rtl .dns-table thead th{text-align:right}
+.dns-table tbody tr{border-bottom:1px solid var(--g100);transition:.1s}
+.dns-table tbody tr:hover{background:var(--cf-blue-50)}
+.dns-table tbody tr:last-child{border-bottom:none}
+.dns-table tbody td{padding:12px 16px;font-size:13px;vertical-align:middle}
+.tbadge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;font-family:'Courier New',monospace}
+.tbadge.A{background:#e0ecfc;color:#003681}.tbadge.AAAA{background:#ede9fe;color:#5b21b6}.tbadge.CNAME{background:#eefaf3;color:#166534}.tbadge.MX{background:#fef9ec;color:#92400e}.tbadge.TXT{background:#fce7f3;color:#9d174d}.tbadge.NS{background:#e0f2fe;color:#075985}.tbadge.SRV{background:#fff7ed;color:#9a3412}.tbadge.CAA{background:#f3e8ff;color:#6b21a8}
+.px-icon{display:inline-flex;align-items:center;gap:4px;font-size:11px}
+.px-icon.on{color:var(--cf-orange)}.px-icon.off{color:var(--g400)}
+.px-icon svg{width:16px;height:16px}
+.n-cell,.c-cell{font-family:'SF Mono','Courier New',monospace;font-size:12px;word-break:break-all;direction:ltr;text-align:left}
+.n-cell{font-weight:600;color:var(--g900)}.c-cell{color:var(--g600);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-cell{font-size:12px;color:var(--g500)}
+.a-cell{display:flex;gap:4px}
+.abtn{width:30px;height:30px;border-radius:6px;border:1px solid var(--g200);background:#fff;color:var(--g500);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+.abtn svg{width:14px;height:14px}
+.abtn:hover{background:var(--g50);color:var(--g700)}.abtn.danger:hover{background:var(--cf-red-soft);color:var(--cf-red);border-color:var(--cf-red)}
+
+/* Status */
+.st{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px}
+.st.active{background:var(--cf-green-soft);color:var(--cf-green)}.st.pending{background:var(--cf-yellow-soft);color:var(--cf-yellow)}.st.inactive{background:var(--cf-red-soft);color:var(--cf-red)}
+.st-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* Zone selector */
+.zone-sel{background:var(--white);border-bottom:1px solid var(--g200);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.zone-dd{flex:1;padding:8px 12px;border:1px solid var(--g300);border-radius:var(--r);font-family:inherit;font-size:14px;font-weight:600;background:var(--white);color:var(--g900);cursor:pointer;outline:none;direction:ltr}
+
+/* Modal */
+.mo-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.mo-bg.open{display:flex}
+.mo-sheet{background:var(--white);border-radius:16px 16px 0 0;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;padding:24px 20px;animation:shUp .3s cubic-bezier(.22,1,.36,1)}
+@keyframes shUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mo-handle{width:36px;height:4px;background:var(--g300);border-radius:2px;margin:0 auto 16px}
+.mo-title{font-size:17px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+
+/* Toast */
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-80px);padding:10px 20px;border-radius:var(--r);font-size:13px;font-weight:600;z-index:200;transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 4px 16px rgba(0,0,0,.1);font-family:inherit}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--cf-green);color:#fff}.toast.err{background:var(--cf-red);color:#fff}.toast.nfo{background:var(--cf-blue-600);color:#fff}
+
+/* Loading */
+.lbar{height:3px;background:var(--g200);position:relative;overflow:hidden}
+.lbar::after{content:'';position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(90deg,transparent,var(--cf-orange),transparent);animation:lslide 1.2s infinite}
+@keyframes lslide{0%{left:-40%}100%{left:100%}}
+.skeleton{background:linear-gradient(90deg,var(--g100) 25%,var(--g200) 50%,var(--g100) 75%);background-size:200% 100%;animation:shim 1.5s infinite;border-radius:4px}
+@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* Empty / Filter */
+.empty{text-align:center;padding:40px 20px}
+.empty svg{width:56px;height:56px;color:var(--g300);margin-bottom:16px}
+.empty h3{font-size:16px;font-weight:700;color:var(--g700);margin-bottom:4px}
+.empty p{font-size:13px;color:var(--g500);margin-bottom:16px}
+.f-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.f-pill{padding:4px 12px;border-radius:16px;border:1px solid var(--g300);background:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;color:var(--g600)}
+.f-pill:hover{border-color:var(--cf-blue-500);color:var(--cf-blue-600)}
+.f-pill.active{background:var(--cf-blue-600);color:#fff;border-color:var(--cf-blue-600)}
+.irow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--g100);font-size:13px}
+.irow:last-child{border-bottom:none}
+.ilbl{color:var(--g500);font-weight:500}
+.ival{color:var(--g900);font-weight:600;direction:ltr}
+
+/* Footer */
+.footer{text-align:center;padding:20px 16px 24px;font-size:12px;color:var(--g400);margin-top:auto}
+.footer a{color:var(--cf-orange);text-decoration:none;font-weight:600}
+.footer a:hover{text-decoration:underline}
+
+/* Responsive */
+@media(max-width:600px){
+  .dns-table thead{display:none}
+  .dns-table tbody tr{display:flex;flex-wrap:wrap;padding:12px 16px;gap:6px;align-items:center}
+  .dns-table tbody td{padding:0;border:none}
+  .c-cell{max-width:none;white-space:normal}
+}
+.view{display:none;animation:vIn .25s ease}.view.active{display:block}
+@keyframes vIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.mt-16{margin-top:16px}
 </style>
 </head>
 <body>
 
-<!-- ═══════════ LOGIN SCREEN ═══════════ -->
 <div id="loginScreen" class="login-screen">
   <div class="login-card">
     <div class="login-logo">
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="64" height="64" rx="16" fill="#0a1628"/>
-        <path d="M44.5 35.2c.2-.7.1-1.4-.3-1.9-.4-.4-.9-.7-1.5-.7l-18.1-.2c-.1 0-.2-.1-.3-.2-.1-.1 0-.2 0-.3.1-.2.3-.4.5-.4l18.3-.2c2.5-.1 5.2-2.1 6.3-4.5l1.4-3.1c.1-.2.1-.3.1-.5C49.5 17.3 44.2 13 38 13c-5.5 0-10.2 3.4-12.2 8.2-.9-.7-2.1-1.1-3.4-1-2.3.2-4.2 2.1-4.5 4.4-.1.5-.1 1 0 1.5C14.2 26.5 11 30 11 34.2c0 .4 0 .7.1 1.1.1.2.2.3.4.3h31.8c.3 0 .6-.1.7-.4l.5-1z" fill="#f6821f"/>
-        <path d="M47.5 26.5c-.2 0-.3 0-.5.1-.1.2-.2.3-.1.5l-.4 1.4c-.5 1.7-.4 3.3.3 4.5.6 1.1 1.7 1.8 3 1.9l3.7.2c.2 0 .3.1.3.2.1.1 0 .2 0 .3-.1.2-.3.4-.5.4l-3.9.2c-2.8.2-5.4 2.5-6.1 5.5l-.3 1.1c0 .2.1.3.3.3h11.4c.2 0 .4-.2.5-.4.5-1.5.8-3.2.8-4.9-.1-5.8-4.4-10.6-8.5-11.3z" fill="#fbad41"/>
-      </svg>
-      <h2>Cloudflare Dashboard</h2>
-      <p>ورود به حساب کاربری</p>
+      <img src="logo.png" alt="EazyFlare">
+      <h2>EazyFlare</h2>
+      <p id="loginSubtitle">Cloudflare DNS Dashboard</p>
     </div>
-
-    <div class="form-group">
-      <label class="form-label">روش احراز هویت</label>
-      <select class="form-select" id="authMethod" onchange="onAuthMethodChange()">
-        <option value="token">API Token (پیشنهادی)</option>
-        <option value="apikey">Global API Key + Email</option>
+    <div style="text-align:center;margin-bottom:16px">
+      <button class="btn btn-sm btn-out" onclick="setLang('en')" id="langEn" style="font-weight:700">EN</button>
+      <button class="btn btn-sm btn-out" onclick="setLang('fa')" id="langFa">فا</button>
+    </div>
+    <div class="fg">
+      <label class="fl" id="lAuthLabel">Authentication Method</label>
+      <select class="fs" id="authMethod" onchange="onAuthChange()">
+        <option value="token" id="optToken">API Token (recommended)</option>
+        <option value="apikey" id="optApikey">Global API Key + Email</option>
       </select>
     </div>
-
-    <div class="form-group" id="emailGroup" style="display:none">
-      <label class="form-label">ایمیل</label>
-      <input class="form-input" id="loginEmail" type="email" placeholder="you@example.com" />
+    <div class="fg" id="emailGrp" style="display:none">
+      <label class="fl" id="lEmailLabel">Email</label>
+      <input class="fi" id="loginEmail" type="email" placeholder="you@example.com"/>
     </div>
-
-    <div class="form-group">
-      <label class="form-label" id="keyLabel">API Token</label>
-      <input class="form-input" id="loginKey" type="password" placeholder="API Token خود را وارد کنید" />
-      <div class="form-hint" id="keyHint">توکن از بخش My Profile → API Tokens قابل ساخت است</div>
+    <div class="fg">
+      <label class="fl" id="keyLbl">API Token</label>
+      <input class="fi" id="loginKey" type="password" id="loginKeyPlaceholder"/>
+      <div class="fh" id="keyHint">From My Profile → API Tokens</div>
     </div>
-
-    <button class="btn btn-orange btn-block" id="loginBtn" onclick="doLogin()" style="margin-top:8px">
-      ورود به حساب
-    </button>
-
-    <div id="loginError" style="display:none; margin-top:12px; padding:10px; border-radius:8px; background:var(--cf-red-soft); color:var(--cf-red); font-size:13px;"></div>
+    <button class="btn btn-or btn-block" id="loginBtn" onclick="doLogin()" style="margin-top:8px" data-en="Sign In" data-fa="ورود به حساب">Sign In</button>
+    <div class="ferr" id="loginErr"></div>
+    <div class="footer" style="margin-top:24px" id="loginFooter">Made with ♡ by <a href="https://t.me/SchmitzWS" target="_blank">Schmitz</a></div>
   </div>
 </div>
 
-<!-- ═══════════ MAIN APP ═══════════ -->
 <div id="mainApp" style="display:none">
-
-  <!-- Top Bar -->
   <div class="topbar">
-    <div class="topbar-brand">
-      <div class="topbar-logo">
-        <svg viewBox="0 0 64 64" fill="none"><path d="M44.5 35.2c.2-.7.1-1.4-.3-1.9-.4-.4-.9-.7-1.5-.7l-18.1-.2c-.1 0-.2-.1-.3-.2-.1-.1 0-.2 0-.3.1-.2.3-.4.5-.4l18.3-.2c2.5-.1 5.2-2.1 6.3-4.5l1.4-3.1c.1-.2.1-.3.1-.5C49.5 17.3 44.2 13 38 13c-5.5 0-10.2 3.4-12.2 8.2-.9-.7-2.1-1.1-3.4-1-2.3.2-4.2 2.1-4.5 4.4-.1.5-.1 1 0 1.5C14.2 26.5 11 30 11 34.2c0 .4 0 .7.1 1.1.1.2.2.3.4.3h31.8c.3 0 .6-.1.7-.4l.5-1z" fill="#f6821f"/><path d="M47.5 26.5c-.2 0-.3 0-.5.1-.1.2-.2.3-.1.5l-.4 1.4c-.5 1.7-.4 3.3.3 4.5.6 1.1 1.7 1.8 3 1.9l3.7.2c.2 0 .3.1.3.2.1.1 0 .2 0 .3-.1.2-.3.4-.5.4l-3.9.2c-2.8.2-5.4 2.5-6.1 5.5l-.3 1.1c0 .2.1.3.3.3h11.4c.2 0 .4-.2.5-.4.5-1.5.8-3.2.8-4.9-.1-5.8-4.4-10.6-8.5-11.3z" fill="#fbad41"/></svg>
-      </div>
-      <div class="topbar-title">Dashboard</div>
-    </div>
+    <div class="topbar-brand"><img src="logo.png" alt="" style="height:28px"><div class="topbar-title">EazyFlare</div></div>
     <div class="topbar-actions">
-      <button class="topbar-btn" onclick="refreshCurrentView()" title="بروزرسانی">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
-      </button>
-      <div class="topbar-user" onclick="doLogout()">
-        <div class="topbar-avatar" id="userAvatar">CF</div>
-        <span>خروج</span>
-      </div>
+      <button class="topbar-btn" onclick="setLang(L==='en'?'fa':'en')" id="langToggle" title="Language">فا</button>
+      <button class="topbar-btn" onclick="refreshView()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></button>
+      <div class="topbar-user" onclick="doLogout()"><div class="topbar-avatar">CF</div><span id="logoutTxt">Logout</span></div>
     </div>
   </div>
-
-  <!-- Zone Selector -->
-  <div class="zone-selector" id="zoneSelector" style="display:none">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cf-gray-500)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-    <select class="zone-select-dropdown" id="zoneDropdown" onchange="onZoneChange()"></select>
+  <div class="zone-sel" id="zoneSel" style="display:none">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--g500)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    <select class="zone-dd" id="zoneDd" onchange="onZoneChange()"></select>
   </div>
-
-  <!-- Nav Tabs -->
   <div class="nav-tabs" id="navTabs" style="display:none">
-    <button class="nav-tab active" data-tab="overview" onclick="switchTab('overview')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      نمای کلی
-    </button>
-    <button class="nav-tab" data-tab="dns" onclick="switchTab('dns')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg>
-      DNS
-      <span class="nav-badge" id="dnsCount">0</span>
-    </button>
+    <button class="nav-tab active" data-tab="overview" onclick="switchTab('overview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span id="tabOverview">Overview</span></button>
+    <button class="nav-tab" data-tab="dns" onclick="switchTab('dns')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg><span>DNS</span><span class="nav-badge" id="dnsCount">0</span></button>
+    <button class="nav-tab" data-tab="ssl" onclick="switchTab('ssl')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="11" width="10" height="8" rx="1"/><path d="M12 15v2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span id="tabSsl">SSL/TLS</span></button>
+    <button class="nav-tab" data-tab="settings" onclick="switchTab('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span id="tabSettings">Settings</span></button>
+    <button class="nav-tab" data-tab="pagerules" onclick="switchTab('pagerules')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg><span id="tabPagerules">Page Rules</span></button>
+    <button class="nav-tab" data-tab="workers" onclick="switchTab('workers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><span id="tabWorkers">Workers</span></button>
+    <button class="nav-tab" data-tab="email" onclick="switchTab('email')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg><span id="tabEmail">Email</span></button>
+    <button class="nav-tab" data-tab="deploy" onclick="switchTab('deploy')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="M8 17l4-4 4 4"/></svg><span id="tabDeploy">Deploy</span></button>
   </div>
-
-  <!-- Loading Bar -->
-  <div class="loading-bar" id="loadingBar" style="display:none"></div>
-
-  <!-- Content -->
-  <div class="content" id="appContent">
-
-    <!-- OVERVIEW TAB -->
-    <div class="view active" id="viewOverview">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            اطلاعات دامنه
-          </div>
-        </div>
-        <div class="card-body" id="zoneInfoBody">
-          <div class="skeleton" style="height:120px;width:100%"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- DNS TAB -->
-    <div class="view" id="viewDns">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/></svg>
-            مدیریت رکوردهای DNS
-          </div>
-          <button class="btn btn-primary btn-sm" onclick="openAddModal()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            افزودن رکورد
-          </button>
-        </div>
-        <div class="card-body compact">
-          <div id="dnsFilterArea" style="padding:12px 16px"></div>
-          <div id="dnsTableArea">
-            <div style="padding:20px"><div class="skeleton" style="height:200px;width:100%"></div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
+  <div class="lbar" id="lbar" style="display:none"></div>
+  <div class="content">
+    <div class="view active" id="viewOverview"><div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span id="cardInfoTitle">Domain Info</span></div></div><div class="card-body" id="zoneInfo"><div class="skeleton" style="height:120px"></div></div></div></div>
+    <div class="view" id="viewDns"><div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/></svg><span id="cardDnsTitle">DNS Records</span></div><button class="btn btn-pri btn-sm" onclick="openAddModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span id="btnAddTxt">Add</span></button></div><div class="card-body compact"><div id="dnsFilters" style="padding:12px 16px"></div><div id="dnsArea"><div style="padding:20px"><div class="skeleton" style="height:200px"></div></div></div></div></div></div>
+    <div class="view" id="viewSsl"><div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="11" width="10" height="8" rx="1"/><path d="M12 15v2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span id="cardSslTitle">SSL/TLS</span></div></div><div class="card-body" id="sslArea"><div class="skeleton" style="height:120px"></div></div></div></div>
+    <div class="view" id="viewSettings"><div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg><span id="cardSettingsTitle">Zone Settings</span></div></div><div class="card-body" id="settingsArea"><div class="skeleton" style="height:200px"></div></div></div></div>
+    <div class="view" id="viewPagerules"><div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/></svg><span id="cardPagerulesTitle">Page Rules</span></div></div><div class="card-body" id="pagerulesArea"><div class="skeleton" style="height:120px"></div></div></div></div>
+    <div class="view" id="viewWorkers"><div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg><span id="cardWorkersTitle">Workers</span></div></div><div class="card-body" id="workersArea"><div class="skeleton" style="height:120px"></div></div></div></div>
+    <div class="view" id="viewEmail"><div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg><span id="cardEmailTitle">Email Routing</span></div></div><div class="card-body" id="emailArea"><div class="skeleton" style="height:120px"></div></div></div></div>
+    <div class="view" id="viewDeploy"><div class="card"><div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="M8 17l4-4 4 4"/></svg><span id="cardDeployTitle">Deploy on Server</span></div></div><div class="card-body" id="deployArea"></div></div></div>
+    <div class="footer" id="appFooter">Made with ♡ by <a href="https://t.me/SchmitzWS" target="_blank">Schmitz</a></div>
   </div>
 </div>
-
-<!-- ═══════════ ADD/EDIT MODAL ═══════════ -->
-<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this)closeModal()">
-  <div class="modal-sheet" id="modalSheet">
-    <div class="modal-handle"></div>
-    <div id="modalContent"></div>
-  </div>
-</div>
-
-<!-- Toast -->
+<div class="mo-bg" id="moBg" onclick="if(event.target===this)closeMo()"><div class="mo-sheet"><div class="mo-handle"></div><div id="moBody"></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
-/* ═══════════ STATE ═══════════ */
-const S = {
-  token: '', email: '', auth: 'token',
-  zones: [], zone: null, dns: [],
-  activeTab: 'overview', filter: ''
+/* ══════ CONFIG ══════ */
+var PROXY = "https://cf-api-proxy.niaawk.workers.dev"; // SET YOUR WORKER URL: https://your-worker.your-subdomain.workers.dev
+
+/* ══════ i18n ══════ */
+var L = localStorage.getItem('ef_lang') || 'en';
+var T = {
+  en: {
+    subtitle: "Cloudflare DNS Dashboard", authLabel: "Authentication Method",
+    optToken: "API Token (recommended)", optApikey: "Global API Key + Email",
+    emailLabel: "Email", tokenLabel: "API Token", keyLabel: "Global API Key",
+    tokenPh: "Enter your API Token", keyPh: "Enter your Global API Key",
+    tokenHint: "From My Profile → API Tokens", signIn: "Sign In", checking: "Checking...",
+    errToken: "Please enter token/key", errEmail: "Please enter email",
+    error: "Error", logout: "Logout", overview: "Overview", domainInfo: "Domain Info",
+    dnsRecords: "DNS Records", add: "Add", domain: "Domain", status: "Status",
+    plan: "Plan", nameservers: "Nameservers", id: "ID", manageDns: "Manage DNS",
+    records: "records", all: "All", noRecords: "No records found",
+    noRecordsDesc: "No DNS records added yet", addRecord: "Add Record",
+    type: "Type", name: "Name", content: "Content", proxy: "Proxy", ttl: "TTL",
+    actions: "Actions", on: "On", off: "Off", auto: "Auto", save: "Save",
+    cancel: "Cancel", editRecord: "Edit Record", deleteRecord: "Delete Record",
+    deleteConfirm: "Delete this record?", deleteWarn: "This cannot be undone!",
+    delete: "Delete", created: "Record created!", updated: "Updated!", deleted: "Deleted!",
+    proxyLabel: "Cloudflare Proxy (orange cloud)", priority: "Priority",
+    min1: "1 min", min5: "5 min", hour1: "1 hour", day1: "1 day",
+    loading: "Loading...", noZones: "No domains found", disconnected: "Logged out",
+    and: "and", more: "more", refresh: "Refresh",
+    footer: 'Made with ♡ by <a href="https://t.me/SchmitzWS" target="_blank">Schmitz</a>',
+    active: "Active", pending: "Pending", moved: "Moved",
+    recType: "Record type", recName: "Name", recContent: "Content",
+    rootHint: "Use @ for root domain",
+    ipv4ph: "1.2.3.4", ipv6ph: "2001:db8::1", cnamePh: "example.com",
+    mxPh: "mail.example.com", txtPh: "v=spf1 ...", nsPh: "ns1.example.com",
+    srvPh: "priority weight port target", caaPh: '0 issue "letsencrypt.org"',
+    sslTls: "SSL/TLS", sslMode: "Encryption Mode", sslCurrent: "Current Mode",
+    sslOff: "Off", sslFlexible: "Flexible", sslFull: "Full", sslStrict: "Full (Strict)",
+    sslOffDesc: "No encryption", sslFlexibleDesc: "Encrypts between browser and Cloudflare",
+    sslFullDesc: "Encrypts end-to-end (self-signed OK)", sslStrictDesc: "Encrypts end-to-end (valid cert required)",
+    sslChanging: "Changing...", sslChanged: "SSL mode changed!", manageSSL: "Manage SSL",
+    manageNS: "Nameservers",
+    zoneSettings: "Settings", pageRules: "Page Rules", workers: "Workers", emailRouting: "Email Routing",
+    enabled: "Enabled", disabled: "Disabled", noRules: "No rules found", noRoutes: "No routes found",
+    pattern: "Pattern", script: "Script", deleteRoute: "Delete", toggleRule: "Toggle",
+    alwaysHttps: "Always HTTPS", autoHttpsRewrites: "Auto HTTPS Rewrites", tls13: "TLS 1.3",
+    http3: "HTTP/3", zeroRtt: "0-RTT", minify: "Minify", brotli: "Brotli",
+    earlyHints: "Early Hints", websockets: "WebSockets", oppEncryption: "Opportunistic Encryption",
+    emailEnabled: "Email Routing Enabled", emailDisabled: "Email Routing Disabled",
+    enable: "Enable", disable: "Disable", matcher: "Match", action: "Action",
+    deploy: "Deploy", deployTitle: "Deploy on Your Server", deployDesc: "Install your own EazyFlare bot on your personal server via SSH.",
+    deployHost: "Server IP", deployPort: "SSH Port", deployUser: "SSH Username", deployPass: "SSH Password",
+    deployBotToken: "Telegram Bot Token", deployWebapp: "Webapp URL (optional)",
+    deployBtn: "Deploy Now", deploying: "Deploying...", deploySuccess: "Deployed successfully!",
+    deployFail: "Deployment failed", deployPrereq: "Prerequisites",
+    deployPrereqList: "Linux server (Ubuntu/Debian) • SSH access • Telegram bot token from @BotFather",
+    deployAuthMethod: "Auth Method", deployPassOpt: "Password", deployKeyOpt: "SSH Key",
+    deployWebappHint: "Leave empty for bot-only (no mini app)", deployStep: "Step"
+  },
+  fa: {
+    subtitle: "داشبورد مدیریت DNS کلادفلر", authLabel: "روش احراز هویت",
+    optToken: "API Token (پیشنهادی)", optApikey: "Global API Key + ایمیل",
+    emailLabel: "ایمیل", tokenLabel: "API Token", keyLabel: "Global API Key",
+    tokenPh: "API Token خود را وارد کنید", keyPh: "Global API Key خود را وارد کنید",
+    tokenHint: "از بخش My Profile → API Tokens", signIn: "ورود به حساب", checking: "در حال بررسی...",
+    errToken: "لطفاً توکن/کلید را وارد کنید", errEmail: "لطفاً ایمیل را وارد کنید",
+    error: "خطا", logout: "خروج", overview: "نمای کلی", domainInfo: "اطلاعات دامنه",
+    dnsRecords: "رکوردهای DNS", add: "افزودن", domain: "دامنه", status: "وضعیت",
+    plan: "پلن", nameservers: "نیم‌سرورها", id: "شناسه", manageDns: "مدیریت DNS",
+    records: "رکورد", all: "همه", noRecords: "رکوردی یافت نشد",
+    noRecordsDesc: "هنوز رکوردی اضافه نشده", addRecord: "افزودن رکورد",
+    type: "نوع", name: "نام", content: "محتوا", proxy: "پروکسی", ttl: "TTL",
+    actions: "عملیات", on: "فعال", off: "خاموش", auto: "خودکار", save: "ذخیره",
+    cancel: "انصراف", editRecord: "ویرایش رکورد", deleteRecord: "حذف رکورد",
+    deleteConfirm: "آیا از حذف اطمینان دارید؟", deleteWarn: "قابل بازگشت نیست!",
+    delete: "حذف", created: "رکورد ایجاد شد!", updated: "بروزرسانی شد!", deleted: "حذف شد!",
+    proxyLabel: "پروکسی Cloudflare (ابر نارنجی)", priority: "اولویت",
+    min1: "۱ دقیقه", min5: "۵ دقیقه", hour1: "۱ ساعت", day1: "۱ روز",
+    loading: "در حال بارگذاری...", noZones: "دامنه‌ای یافت نشد", disconnected: "خارج شدید",
+    and: "و", more: "دیگر", refresh: "بروزرسانی",
+    footer: 'ساخته شده با ♡ توسط <a href="https://t.me/SchmitzWS" target="_blank">شمیتز</a>',
+    active: "فعال", pending: "در انتظار", moved: "منتقل شده",
+    recType: "نوع رکورد", recName: "نام", recContent: "محتوا",
+    rootHint: "برای ریشه دامنه @ بگذارید",
+    ipv4ph: "1.2.3.4", ipv6ph: "2001:db8::1", cnamePh: "example.com",
+    mxPh: "mail.example.com", txtPh: "v=spf1 ...", nsPh: "ns1.example.com",
+    srvPh: "priority weight port target", caaPh: '0 issue "letsencrypt.org"',
+    sslTls: "SSL/TLS", sslMode: "حالت رمزنگاری", sslCurrent: "حالت فعلی",
+    sslOff: "خاموش", sslFlexible: "Flexible", sslFull: "Full", sslStrict: "Full (Strict)",
+    sslOffDesc: "بدون رمزنگاری", sslFlexibleDesc: "رمزنگاری بین مرورگر و کلادفلر",
+    sslFullDesc: "رمزنگاری سرتاسر (گواهی self-signed مجاز)", sslStrictDesc: "رمزنگاری سرتاسر (گواهی معتبر لازم)",
+    sslChanging: "در حال تغییر...", sslChanged: "حالت SSL تغییر کرد!", manageSSL: "مدیریت SSL",
+    manageNS: "نیم‌سرورها",
+    zoneSettings: "تنظیمات", pageRules: "Page Rules", workers: "Workers", emailRouting: "مسیریابی ایمیل",
+    enabled: "فعال", disabled: "غیرفعال", noRules: "قانونی یافت نشد", noRoutes: "مسیری یافت نشد",
+    pattern: "الگو", script: "اسکریپت", deleteRoute: "حذف", toggleRule: "تغییر وضعیت",
+    alwaysHttps: "همیشه HTTPS", autoHttpsRewrites: "بازنویسی خودکار HTTPS", tls13: "TLS 1.3",
+    http3: "HTTP/3", zeroRtt: "0-RTT", minify: "فشرده‌سازی", brotli: "Brotli",
+    earlyHints: "Early Hints", websockets: "WebSockets", oppEncryption: "رمزنگاری فرصت‌طلبانه",
+    emailEnabled: "مسیریابی ایمیل فعال", emailDisabled: "مسیریابی ایمیل غیرفعال",
+    enable: "فعال کردن", disable: "غیرفعال کردن", matcher: "تطبیق", action: "عمل",
+    deploy: "نصب", deployTitle: "نصب روی سرور شخصی", deployDesc: "ربات EazyFlare خودتون رو روی سرور شخصی‌تون از طریق SSH نصب کنید.",
+    deployHost: "آدرس IP سرور", deployPort: "پورت SSH", deployUser: "نام کاربری SSH", deployPass: "رمز عبور SSH",
+    deployBotToken: "توکن ربات تلگرام", deployWebapp: "آدرس وب‌اپ (اختیاری)",
+    deployBtn: "شروع نصب", deploying: "در حال نصب...", deploySuccess: "نصب موفق!",
+    deployFail: "نصب ناموفق", deployPrereq: "پیش‌نیازها",
+    deployPrereqList: "سرور لینوکسی (Ubuntu/Debian) • دسترسی SSH • توکن ربات از @BotFather",
+    deployAuthMethod: "روش احراز هویت", deployPassOpt: "رمز عبور", deployKeyOpt: "کلید SSH",
+    deployWebappHint: "خالی بگذارید اگر مینی‌اپ نمی‌خواید", deployStep: "مرحله"
+  }
 };
+function t(k){return T[L][k]||T['en'][k]||k}
 
-const API = 'https://api.cloudflare.com/client/v4';
-
-/* ═══════════ API ═══════════ */
-function hdrs() {
-  return S.auth === 'token'
-    ? { 'Authorization': `Bearer ${S.token}`, 'Content-Type': 'application/json' }
-    : { 'X-Auth-Email': S.email, 'X-Auth-Key': S.token, 'Content-Type': 'application/json' };
+function setLang(lang){
+  L=lang;localStorage.setItem('ef_lang',L);
+  document.documentElement.lang=L==='fa'?'fa':'en';
+  document.documentElement.dir=L==='fa'?'rtl':'ltr';
+  document.body.classList.toggle('rtl',L==='fa');
+  // Update static texts
+  $('loginSubtitle').textContent=t('subtitle');
+  $('lAuthLabel').textContent=t('authLabel');
+  $('optToken').textContent=t('optToken');
+  $('optApikey').textContent=t('optApikey');
+  $('loginBtn').textContent=t('signIn');
+  $('keyHint').textContent=t('tokenHint');
+  $('logoutTxt').textContent=t('logout');
+  $('tabOverview').textContent=t('overview');
+  $('cardInfoTitle').textContent=t('domainInfo');
+  $('cardDnsTitle').textContent=t('dnsRecords');
+  $('btnAddTxt').textContent=t('add');
+  $('tabSsl').textContent=t('sslTls');
+  $('cardSslTitle').textContent=t('sslTls');
+  $('tabSettings').textContent=t('zoneSettings');
+  $('cardSettingsTitle').textContent=t('zoneSettings');
+  $('tabPagerules').textContent=t('pageRules');
+  $('cardPagerulesTitle').textContent=t('pageRules');
+  $('tabWorkers').textContent=t('workers');
+  $('cardWorkersTitle').textContent=t('workers');
+  $('tabEmail').textContent=t('emailRouting');
+  $('cardEmailTitle').textContent=t('emailRouting');
+  $('tabDeploy').textContent=t('deploy');
+  $('cardDeployTitle').textContent=t('deployTitle');
+  $('loginFooter').innerHTML=t('footer');
+  $('appFooter').innerHTML=t('footer');
+  $('langToggle').textContent=L==='en'?'فا':'EN';
+  $('langEn').style.fontWeight=L==='en'?'700':'400';
+  $('langFa').style.fontWeight=L==='fa'?'700':'400';
+  onAuthChange();
+  if(S.zone){renderInfo();if(S.dns.length)renderTable();if(S.tab==='ssl')loadSSL();if(S.tab==='settings')loadSettings();if(S.tab==='pagerules')loadPageRules();if(S.tab==='workers')loadWorkers();if(S.tab==='email')loadEmail();if(S.tab==='deploy')renderDeploy()}
 }
 
-async function cf(path, opt = {}) {
-  const r = await fetch(`${API}${path}`, { ...opt, headers: { ...hdrs(), ...(opt.headers||{}) } });
-  const d = await r.json();
-  if (!d.success) throw new Error(d.errors?.map(e=>e.message).join(', ')||'خطای ناشناخته');
-  return d;
+/* ══════ STATE ══════ */
+var S={token:'',email:'',auth:'token',zones:[],zone:null,dns:[],tab:'overview',filter:''};
+var $=function(id){return document.getElementById(id)};
+
+function hdrs(){
+  var h={"Content-Type":"application/json"};
+  if(S.auth==='token')h["X-CF-Token"]=S.token;
+  else{h["X-CF-Email"]=S.email;h["X-CF-Key"]=S.token}
+  return h;
+}
+function cf(path,opt){
+  opt=opt||{};var url=PROXY+path;var h=hdrs();
+  if(opt.headers){for(var k in opt.headers)h[k]=opt.headers[k]}
+  opt.headers=h;
+  return fetch(url,opt).then(function(r){return r.json()}).then(function(d){
+    if(!d.success)throw new Error((d.errors||[]).map(function(e){return e.message}).join(', ')||'Unknown');return d});
+}
+function showL(){$('lbar').style.display='block'}
+function hideL(){$('lbar').style.display='none'}
+function toast(m,tp){tp=tp||'nfo';var e=$('toast');e.textContent=m;e.className='toast '+tp+' show';setTimeout(function(){e.classList.remove('show')},3000)}
+function openMo(h){$('moBody').innerHTML=h;$('moBg').classList.add('open')}
+function closeMo(){$('moBg').classList.remove('open')}
+function switchTab(tab){S.tab=tab;document.querySelectorAll('.nav-tab').forEach(function(n){n.classList.toggle('active',n.dataset.tab===tab)});document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active')});$('view'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');if(tab==='ssl')loadSSL();if(tab==='settings')loadSettings();if(tab==='pagerules')loadPageRules();if(tab==='workers')loadWorkers();if(tab==='email')loadEmail();if(tab==='deploy')renderDeploy()}
+
+function onAuthChange(){
+  var m=$('authMethod').value;
+  $('emailGrp').style.display=m==='apikey'?'block':'none';
+  if(m==='token'){$('keyLbl').textContent=t('tokenLabel');$('loginKey').placeholder=t('tokenPh')}
+  else{$('keyLbl').textContent=t('keyLabel');$('loginKey').placeholder=t('keyPh')}
+  if($('lEmailLabel'))$('lEmailLabel').textContent=t('emailLabel');
+}
+function doLogin(){
+  var method=$('authMethod').value,key=$('loginKey').value.trim(),email=$('loginEmail').value.trim();
+  if(!key){showErr(t('errToken'));return}
+  if(method==='apikey'&&!email){showErr(t('errEmail'));return}
+  S.auth=method;S.token=key;S.email=email;
+  $('loginBtn').disabled=true;$('loginBtn').textContent=t('checking');$('loginErr').style.display='none';
+  var path=method==='token'?'/user/tokens/verify':'/zones?per_page=1';
+  cf(path).then(function(){localStorage.setItem('cf_auth',JSON.stringify({auth:S.auth,token:S.token,email:S.email}));enterApp()})
+  .catch(function(e){showErr(t('error')+': '+e.message)})
+  .finally(function(){$('loginBtn').disabled=false;$('loginBtn').textContent=t('signIn')});
+}
+function showErr(m){var e=$('loginErr');e.textContent=m;e.style.display='block'}
+function doLogout(){S.token='';S.email='';S.zones=[];S.zone=null;S.dns=[];localStorage.removeItem('cf_auth');$('mainApp').style.display='none';$('loginScreen').style.display='flex';$('loginKey').value='';$('loginEmail').value='';toast(t('disconnected'),'nfo')}
+function enterApp(){$('loginScreen').style.display='none';$('mainApp').style.display='block';loadApp()}
+
+function loadApp(){showL();var all=[],p=1;function lp(){cf('/zones?per_page=50&page='+p).then(function(d){all=all.concat(d.result);var tp=(d.result_info&&d.result_info.total_pages)||1;if(p<tp){p++;lp()}else{S.zones=all;renderZoneDd();if(all.length>0){var params=new URLSearchParams(location.search);var pre=params.get('zone');var idx=-1;if(pre)for(var i=0;i<all.length;i++){if(all[i].id===pre){idx=i;break}}if(idx<0)idx=0;$('zoneDd').selectedIndex=idx;selectZone(all[idx])}$('zoneSel').style.display='flex';$('navTabs').style.display='flex';hideL()}}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()})}lp()}
+
+function renderZoneDd(){var dd=$('zoneDd');dd.innerHTML='';S.zones.forEach(function(z){var st=z.status==='active'?'🟢':z.status==='pending'?'🟡':'🔴';var o=document.createElement('option');o.value=z.id;o.textContent=st+' '+z.name+' — '+(z.plan&&z.plan.name||'Free');dd.appendChild(o)})}
+function onZoneChange(){var z=S.zones.find(function(x){return x.id===$('zoneDd').value});if(z)selectZone(z)}
+function selectZone(z){S.zone=z;renderInfo();loadDNS()}
+
+function renderInfo(){
+  var z=S.zone;if(!z)return;
+  var sm={active:[t('active'),'active'],pending:[t('pending'),'pending'],moved:[t('moved'),'inactive']};
+  var pair=sm[z.status]||[z.status,'inactive'];
+  var ns=(z.name_servers||[]).map(function(n){return'<code style="font-size:12px">'+n+'</code>'}).join('<br>')||'—';
+  $('zoneInfo').innerHTML='<div class="irow"><span class="ilbl">'+t('domain')+'</span><span class="ival">'+z.name+'</span></div><div class="irow"><span class="ilbl">'+t('status')+'</span><span><span class="st '+pair[1]+'"><span class="st-dot"></span>'+pair[0]+'</span></span></div><div class="irow"><span class="ilbl">'+t('plan')+'</span><span class="ival">'+(z.plan&&z.plan.name||'Free')+'</span></div><div class="irow"><span class="ilbl">'+t('nameservers')+'</span><span class="ival">'+ns+'</span></div><div class="irow"><span class="ilbl">'+t('id')+'</span><span class="ival" style="font-size:11px">'+z.id+'</span></div><div class="mt-16" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-pri" onclick="switchTab(\'dns\')">'+t('manageDns')+'</button><button class="btn btn-pri" onclick="switchTab(\'ssl\')">'+t('manageSSL')+'</button></div>';
 }
 
-/* ═══════════ HELPERS ═══════════ */
-const $ = id => document.getElementById(id);
-function showLoad() { $('loadingBar').style.display = 'block'; }
-function hideLoad() { $('loadingBar').style.display = 'none'; }
-
-function toast(msg, type='info') {
-  const t = $('toast');
-  t.textContent = msg;
-  t.className = `toast ${type} show`;
-  setTimeout(()=>t.classList.remove('show'), 3000);
+function loadSSL(){
+  if(!S.zone)return;
+  $('sslArea').innerHTML='<div class="skeleton" style="height:120px"></div>';
+  showL();
+  cf('/zones/'+S.zone.id+'/settings/ssl').then(function(d){
+    var cur=d.result.value;
+    var modes=[
+      {id:'off',label:t('sslOff'),desc:t('sslOffDesc'),icon:'🔴'},
+      {id:'flexible',label:t('sslFlexible'),desc:t('sslFlexibleDesc'),icon:'🟡'},
+      {id:'full',label:t('sslFull'),desc:t('sslFullDesc'),icon:'🟢'},
+      {id:'strict',label:t('sslStrict'),desc:t('sslStrictDesc'),icon:'🔵'}
+    ];
+    var h='<div style="padding:4px 0"><div class="irow"><span class="ilbl">'+t('sslCurrent')+'</span><span class="ival" style="font-weight:600">'+cur+'</span></div></div>';
+    h+='<div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">';
+    modes.forEach(function(m){
+      var active=m.id===cur;
+      h+='<div style="border:1.5px solid '+(active?'var(--cf-blue-600)':'var(--g200)')+';border-radius:10px;padding:12px 14px;cursor:'+(active?'default':'pointer')+';opacity:'+(active?'1':'0.85')+';transition:.15s" '+(active?'':'onclick="changeSSL(\''+m.id+'\')"')+'>';
+      h+='<div style="display:flex;align-items:center;gap:8px"><span>'+m.icon+'</span><b>'+m.label+'</b>'+(active?' <span style="color:var(--cf-blue-600);font-size:12px">✓ active</span>':'')+'</div>';
+      h+='<div style="font-size:12px;color:var(--g500);margin-top:4px">'+m.desc+'</div></div>';
+    });
+    h+='</div>';
+    $('sslArea').innerHTML=h;
+    hideL();
+  }).catch(function(e){
+    $('sslArea').innerHTML='<div style="padding:16px;color:var(--g500)">'+t('error')+': '+e.message+'</div>';
+    hideL();
+  });
 }
 
-function openModal(html) {
-  $('modalContent').innerHTML = html;
-  $('modalBackdrop').classList.add('open');
-}
-function closeModal() {
-  $('modalBackdrop').classList.remove('open');
-}
-
-function switchTab(tab) {
-  S.activeTab = tab;
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  $(`view${tab.charAt(0).toUpperCase()+tab.slice(1)}`).classList.add('active');
+function changeSSL(mode){
+  if(!S.zone)return;
+  showL();
+  $('sslArea').innerHTML='<div style="padding:20px;text-align:center">'+t('sslChanging')+'</div>';
+  fetch(PROXY+'/zones/'+S.zone.id+'/settings/ssl',{method:'PATCH',headers:hdrs(),body:JSON.stringify({value:mode})})
+  .then(function(r){return r.json()})
+  .then(function(d){
+    if(d.success){toast(t('sslChanged'),'ok');loadSSL()}
+    else{toast(t('error')+': '+(d.errors[0]&&d.errors[0].message||'Unknown'),'err');loadSSL()}
+  }).catch(function(e){toast(t('error')+': '+e.message,'err');loadSSL()});
 }
 
-/* ═══════════ AUTH ═══════════ */
-function onAuthMethodChange() {
-  const m = $('authMethod').value;
-  $('emailGroup').style.display = m === 'apikey' ? 'block' : 'none';
-  $('keyLabel').textContent = m === 'token' ? 'API Token' : 'Global API Key';
-  $('loginKey').placeholder = m === 'token' ? 'API Token خود را وارد کنید' : 'Global API Key خود را وارد کنید';
-  $('keyHint').textContent = m === 'token'
-    ? 'توکن از بخش My Profile → API Tokens قابل ساخت است'
-    : 'از بخش My Profile → API Tokens → Global API Key';
+/* ══════ ZONE SETTINGS ══════ */
+var ZS_KEYS=[
+  {k:'always_use_https',l:'alwaysHttps'},
+  {k:'automatic_https_rewrites',l:'autoHttpsRewrites'},
+  {k:'tls_1_3',l:'tls13'},
+  {k:'http3',l:'http3'},
+  {k:'0rtt',l:'zeroRtt'},
+  {k:'brotli',l:'brotli'},
+  {k:'early_hints',l:'earlyHints'},
+  {k:'websockets',l:'websockets'},
+  {k:'opportunistic_encryption',l:'oppEncryption'},
+  {k:'minify',l:'minify'}
+];
+function loadSettings(){
+  if(!S.zone)return;
+  $('settingsArea').innerHTML='<div class="skeleton" style="height:200px"></div>';
+  showL();
+  var zid=S.zone.id;
+  var promises=ZS_KEYS.map(function(s){return cf('/zones/'+zid+'/settings/'+s.k).then(function(d){return{key:s.k,label:s.l,val:d.result.value}}).catch(function(){return{key:s.k,label:s.l,val:null}})});
+  Promise.all(promises).then(function(results){
+    var h='<div style="display:flex;flex-direction:column;gap:6px">';
+    results.forEach(function(r){
+      if(r.val===null)return;
+      if(r.key==='minify'&&typeof r.val==='object'){
+        var allOn=r.val.js==='on'&&r.val.css==='on'&&r.val.html==='on';
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid var(--g200);border-radius:8px">';
+        h+='<span>📦 '+t(r.label)+' <span style="font-size:11px;color:var(--g500)">(JS:'+r.val.js+' CSS:'+r.val.css+' HTML:'+r.val.html+')</span></span>';
+        h+='<button class="btn btn-sm '+(allOn?'btn-pri':'btn-out')+'" onclick="toggleSetting(\'minify\',\''+(allOn?'off':'on')+'\')">'+(allOn?'✅ ON':'❌ OFF')+'</button>';
+        h+='</div>';
+      } else {
+        var isOn=r.val==='on';
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid var(--g200);border-radius:8px">';
+        h+='<span>'+t(r.label)+'</span>';
+        h+='<button class="btn btn-sm '+(isOn?'btn-pri':'btn-out')+'" onclick="toggleSetting(\''+r.key+'\',\''+(isOn?'off':'on')+'\')">'+(isOn?'✅ ON':'❌ OFF')+'</button>';
+        h+='</div>';
+      }
+    });
+    h+='</div>';
+    $('settingsArea').innerHTML=h;
+    hideL();
+  });
+}
+function toggleSetting(key,val){
+  if(!S.zone)return;showL();
+  var body=key==='minify'?{value:{js:val,css:val,html:val}}:{value:val};
+  fetch(PROXY+'/zones/'+S.zone.id+'/settings/'+key,{method:'PATCH',headers:hdrs(),body:JSON.stringify(body)})
+  .then(function(r){return r.json()})
+  .then(function(d){
+    if(d.success){toast('✅','ok');loadSettings()}
+    else{toast(t('error')+': '+(d.errors[0]&&d.errors[0].message||''),'err');hideL()}
+  }).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()});
 }
 
-async function doLogin() {
-  const method = $('authMethod').value;
-  const key = $('loginKey').value.trim();
-  const email = $('loginEmail').value.trim();
-
-  if (!key) { showLoginErr('لطفاً توکن/کلید را وارد کنید'); return; }
-  if (method === 'apikey' && !email) { showLoginErr('لطفاً ایمیل را وارد کنید'); return; }
-
-  S.auth = method;
-  S.token = key;
-  S.email = email;
-
-  $('loginBtn').disabled = true;
-  $('loginBtn').textContent = 'در حال بررسی...';
-  $('loginError').style.display = 'none';
-
-  try {
-    if (method === 'token') {
-      await cf('/user/tokens/verify');
+/* ══════ PAGE RULES ══════ */
+function loadPageRules(){
+  if(!S.zone)return;
+  $('pagerulesArea').innerHTML='<div class="skeleton" style="height:120px"></div>';
+  showL();
+  cf('/zones/'+S.zone.id+'/pagerules?status=active,disabled').then(function(d){
+    var rules=d.result||[];
+    var h='';
+    if(!rules.length){
+      h+='<div style="padding:16px;text-align:center;color:var(--g500)">'+t('noRules')+'</div>';
     } else {
-      await cf('/zones?per_page=1');
+      h+='<div style="display:flex;flex-direction:column;gap:8px">';
+      rules.forEach(function(r,i){
+        var st=r.status==='active';
+        var targets=r.targets.map(function(t){return t.constraint.value}).join(', ');
+        var actions=r.actions.map(function(a){return a.id+(a.value?': '+JSON.stringify(a.value).substring(0,30):'')}).join(', ');
+        h+='<div style="border:1px solid var(--g200);border-radius:8px;padding:12px">';
+        h+='<div style="display:flex;justify-content:space-between;align-items:center">';
+        h+='<div><span style="font-size:12px;color:'+(st?'var(--cf-green)':'var(--g400)')+'">●</span> <code style="font-size:12px">'+targets+'</code></div>';
+        h+='<div style="display:flex;gap:4px">';
+        h+='<button class="btn btn-sm btn-out" onclick="togglePageRule(\''+r.id+'\',\''+r.status+'\')">'+(st?'⏸':'▶️')+'</button>';
+        h+='<button class="btn btn-sm btn-out" onclick="deletePageRule(\''+r.id+'\')">🗑</button>';
+        h+='</div></div>';
+        h+='<div style="font-size:12px;color:var(--g500);margin-top:4px">→ '+actions+'</div>';
+        h+='</div>';
+      });
+      h+='</div>';
     }
-    localStorage.setItem('cf_auth', JSON.stringify({ auth: S.auth, token: S.token, email: S.email }));
-    $('loginScreen').style.display = 'none';
-    $('mainApp').style.display = 'block';
-    await loadApp();
-  } catch(e) {
-    showLoginErr(`خطا در احراز هویت: ${e.message}`);
-  }
-
-  $('loginBtn').disabled = false;
-  $('loginBtn').textContent = 'ورود به حساب';
+    h+='<div style="margin-top:12px"><button class="btn btn-pri btn-sm" onclick="openAddPageRule()">➕ '+t('add')+' Page Rule</button></div>';
+    $('pagerulesArea').innerHTML=h;
+    hideL();
+  }).catch(function(e){$('pagerulesArea').innerHTML='<div style="padding:16px;color:var(--g500)">'+t('error')+': '+e.message+'</div>';hideL()});
 }
-
-function showLoginErr(msg) {
-  const el = $('loginError');
-  el.textContent = msg;
-  el.style.display = 'block';
+function openAddPageRule(){
+  var dom=S.zone?S.zone.name:'example.com';
+  var h='<div style="font-weight:600;margin-bottom:12px;font-size:16px">➕ Add Page Rule</div>';
+  h+='<div style="margin-bottom:12px"><label style="font-size:13px;font-weight:500;display:block;margin-bottom:6px">URL Pattern</label><input id="prUrl" class="fi" placeholder="'+dom+'/*" style="font-size:15px;padding:12px 14px"></div>';
+  h+='<div style="margin-bottom:12px"><label style="font-size:13px;font-weight:500;display:block;margin-bottom:6px">Action</label><select id="prAction" class="fs" style="font-size:15px;padding:12px 14px" onchange="onPrAction()"><option value="always_use_https">Always Use HTTPS</option><option value="forwarding_url_301">301 Redirect</option><option value="forwarding_url_302">302 Redirect</option><option value="cache_level_bypass">Cache: Bypass</option><option value="cache_level_aggressive">Cache: Aggressive</option><option value="ssl_flexible">SSL: Flexible</option><option value="ssl_full">SSL: Full</option><option value="ssl_strict">SSL: Strict</option></select></div>';
+  h+='<div id="prValWrap" style="margin-bottom:12px;display:none"><label style="font-size:13px;font-weight:500;display:block;margin-bottom:6px">Value</label><input id="prVal" class="fi" placeholder="https://example.com/$1" style="font-size:15px;padding:12px 14px"></div>';
+  h+='<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn btn-out" onclick="closeMo()">'+t('cancel')+'</button><button class="btn btn-pri" onclick="submitPageRule()">'+t('save')+'</button></div>';
+  openMo(h);
+  onPrAction();
 }
-
-function doLogout() {
-  S.token = ''; S.email = '';
-  S.zones = []; S.zone = null; S.dns = [];
-  localStorage.removeItem('cf_auth');
-  $('mainApp').style.display = 'none';
-  $('loginScreen').style.display = 'flex';
-  $('loginKey').value = '';
-  $('loginEmail').value = '';
-  toast('از حساب خارج شدید', 'info');
+function onPrAction(){
+  var v=$('prAction').value;
+  var show=v.startsWith('forwarding_url');
+  $('prValWrap').style.display=show?'block':'none';
 }
-
-/* ═══════════ LOAD APP ═══════════ */
-async function loadApp() {
-  showLoad();
-  try {
-    let all = [], p = 1;
-    do {
-      const d = await cf(`/zones?per_page=50&page=${p}`);
-      all = all.concat(d.result);
-      if (p >= (d.result_info?.total_pages||1)) break;
-      p++;
-    } while(true);
-
-    S.zones = all;
-    renderZoneSelector();
-    if (all.length > 0) {
-      // Check URL params for pre-selected zone
-      const params = new URLSearchParams(location.search);
-      const preZone = params.get('zone');
-      const idx = preZone ? all.findIndex(z=>z.id===preZone) : 0;
-      $('zoneDropdown').selectedIndex = idx >= 0 ? idx : 0;
-      await selectZone(all[idx >= 0 ? idx : 0]);
+function submitPageRule(){
+  if(!S.zone)return;
+  var url=$('prUrl').value.trim();
+  if(!url){toast(t('error'),'err');return}
+  var raw=$('prAction').value;
+  var action;
+  if(raw==='forwarding_url_301'||raw==='forwarding_url_302'){
+    var code=raw.endsWith('301')?301:302;
+    var dest=$('prVal').value.trim();
+    if(!dest){toast(t('error'),'err');return}
+    action={id:'forwarding_url',value:{url:dest,status_code:code}};
+  } else {
+    var parts=raw.split('_');
+    if(parts.length>=2&&(parts[0]==='cache'||parts[0]==='ssl')){
+      action={id:parts[0]+'_level',value:parts.slice(1).join('_')};
+      if(parts[0]==='ssl')action.id='ssl';
+    } else {
+      action={id:raw};
     }
-    $('zoneSelector').style.display = 'flex';
-    $('navTabs').style.display = 'flex';
-  } catch(e) {
-    toast('خطا در دریافت اطلاعات: ' + e.message, 'error');
   }
-  hideLoad();
+  var body={targets:[{target:'url',constraint:{operator:'matches',value:url}}],actions:[action],status:'active'};
+  showL();closeMo();
+  fetch(PROXY+'/zones/'+S.zone.id+'/pagerules',{method:'POST',headers:hdrs(),body:JSON.stringify(body)})
+  .then(function(r){return r.json()}).then(function(d){if(d.success){toast(t('created'),'ok');loadPageRules()}else{toast(t('error')+': '+(d.errors&&d.errors[0]&&d.errors[0].message||''),'err');hideL()}}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()});
+}
+function togglePageRule(id,cur){
+  if(!S.zone)return;showL();
+  var ns=cur==='active'?'disabled':'active';
+  fetch(PROXY+'/zones/'+S.zone.id+'/pagerules/'+id,{method:'PATCH',headers:hdrs(),body:JSON.stringify({status:ns})})
+  .then(function(r){return r.json()}).then(function(d){if(d.success)loadPageRules();else{toast(t('error'),'err');hideL()}}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()});
+}
+function deletePageRule(id){
+  if(!S.zone||!confirm(t('deleteConfirm')))return;showL();
+  fetch(PROXY+'/zones/'+S.zone.id+'/pagerules/'+id,{method:'DELETE',headers:hdrs()})
+  .then(function(r){return r.json()}).then(function(d){if(d.success){toast(t('deleted'),'ok');loadPageRules()}else{toast(t('error'),'err');hideL()}}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()});
 }
 
-function renderZoneSelector() {
-  const dd = $('zoneDropdown');
-  dd.innerHTML = '';
-  S.zones.forEach((z, i) => {
-    const st = z.status === 'active' ? '🟢' : z.status === 'pending' ? '🟡' : '🔴';
-    const opt = document.createElement('option');
-    opt.value = z.id;
-    opt.textContent = `${st} ${z.name} — ${z.plan?.name||'Free'}`;
-    dd.appendChild(opt);
+/* ══════ WORKERS ══════ */
+function loadWorkers(){
+  if(!S.zone)return;
+  $('workersArea').innerHTML='<div class="skeleton" style="height:120px"></div>';
+  showL();
+  var accId=S.zone.account&&S.zone.account.id;
+  var pScripts=accId?cf('/accounts/'+accId+'/workers/scripts').catch(function(){return{result:[]}}):Promise.resolve({result:[]});
+  var pRoutes=cf('/zones/'+S.zone.id+'/workers/routes').catch(function(){return{result:[]}});
+  Promise.all([pScripts,pRoutes]).then(function(res){
+    var scripts=res[0].result||[];
+    var routes=res[1].result||[];
+    if(!scripts.length&&!routes.length){$('workersArea').innerHTML='<div style="padding:20px;text-align:center;color:var(--g500)">'+t('noRoutes')+'</div>';hideL();return}
+    var h='';
+    if(scripts.length){
+      h+='<div style="font-weight:600;margin-bottom:8px;font-size:13px">📜 Scripts ('+scripts.length+')</div>';
+      h+='<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">';
+      scripts.forEach(function(s){
+        h+='<div style="border:1px solid var(--g200);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center">';
+        h+='<div><code style="font-size:12px">'+s.id+'</code>';
+        if(s.modified_on){h+='<div style="font-size:11px;color:var(--g400)">'+new Date(s.modified_on).toLocaleDateString()+'</div>'}
+        h+='</div>';
+        h+='<div style="display:flex;gap:4px">';
+        h+='<button class="btn btn-sm btn-out" onclick="viewWorker(\''+s.id+'\')">📄</button>';
+        h+='<button class="btn btn-sm btn-out" onclick="editWorker(\''+s.id+'\')">✏️</button>';
+        h+='<button class="btn btn-sm btn-out" onclick="deleteWorker(\''+s.id+'\')">🗑</button>';
+        h+='</div></div>';
+      });
+      h+='</div>';
+    }
+    if(routes.length){
+      h+='<div style="font-weight:600;margin-bottom:8px;font-size:13px">🔀 Routes ('+routes.length+')</div>';
+      h+='<div style="display:flex;flex-direction:column;gap:6px">';
+      routes.forEach(function(r){
+        h+='<div style="border:1px solid var(--g200);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center">';
+        h+='<div><code style="font-size:12px">'+r.pattern+'</code><div style="font-size:11px;color:var(--g400)">→ '+(r.script||'—')+'</div></div>';
+        h+='<button class="btn btn-sm btn-out" onclick="deleteWorkerRoute(\''+r.id+'\')">🗑</button>';
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+    h+='<div style="margin-top:12px"><button class="btn btn-pri btn-sm" onclick="openCreateWorker()">➕ Worker جدید</button></div>';
+    $('workersArea').innerHTML=h;
+    hideL();
   });
 }
-
-async function onZoneChange() {
-  const zid = $('zoneDropdown').value;
-  const zone = S.zones.find(z=>z.id===zid);
-  if (zone) await selectZone(zone);
+function editWorker(name){
+  if(!S.zone)return;
+  var accId=S.zone.account&&S.zone.account.id;if(!accId)return;
+  showL();
+  fetch(PROXY+'/accounts/'+accId+'/workers/scripts/'+name,{headers:hdrs()})
+  .then(function(r){return r.text()})
+  .then(function(code){
+    hideL();
+    openWorkerEditor(name,code);
+  }).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()});
+}
+function openCreateWorker(){
+  openWorkerEditor('','');
+}
+function openWorkerEditor(name,code){
+  var isNew=!name;
+  var h='<div style="font-weight:600;margin-bottom:12px;font-size:16px">'+(isNew?'➕ Worker جدید':'✏️ ادیت '+name)+'</div>';
+  if(isNew){h+='<div style="margin-bottom:12px"><label style="font-size:13px;font-weight:500;display:block;margin-bottom:6px">نام Worker</label><input id="wkName" class="fi" placeholder="my-worker" style="font-size:15px;padding:12px 14px"></div>';}
+  h+='<div style="margin-bottom:12px"><label style="font-size:13px;font-weight:500;display:block;margin-bottom:6px">کد JavaScript</label><textarea id="wkCode" class="fi" style="min-height:50vh;font-family:\'Courier New\',monospace;font-size:13px;line-height:1.5;white-space:pre;direction:ltr;text-align:left;resize:vertical;padding:12px 14px" placeholder="addEventListener(\'fetch\', event => { ... })">'+(code?code.replace(/</g,'&lt;').replace(/>/g,'&gt;'):'')+'</textarea></div>';
+  h+='<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn btn-out" onclick="closeMo()">'+t('cancel')+'</button><button class="btn btn-pri" onclick="publishWorker(\''+(name||'')+'\')">🚀 Publish</button></div>';
+  openMo(h);
+}
+function publishWorker(existingName){
+  if(!S.zone)return;
+  var accId=S.zone.account&&S.zone.account.id;if(!accId){toast('No account ID','err');return}
+  var name=existingName||($('wkName')?$('wkName').value.trim().replace(/\s+/g,'-').toLowerCase():'');
+  if(!name){toast('نام Worker لازمه','err');return}
+  var code=$('wkCode').value;
+  if(!code.trim()){toast('کد خالیه','err');return}
+  closeMo();showL();
+  var h=hdrs();h['Content-Type']='application/javascript';
+  fetch(PROXY+'/accounts/'+accId+'/workers/scripts/'+name,{method:'PUT',headers:h,body:code})
+  .then(function(r){return r.json()})
+  .then(function(d){
+    if(d.success){toast('✅ '+name+' published!','ok');loadWorkers()}
+    else{toast(t('error')+': '+(d.errors&&d.errors[0]&&d.errors[0].message||''),'err');hideL()}
+  }).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()});
+}
+function viewWorker(name){
+  if(!S.zone)return;
+  var accId=S.zone.account&&S.zone.account.id;if(!accId)return;
+  showL();
+  fetch(PROXY+'/accounts/'+accId+'/workers/scripts/'+name,{headers:hdrs()})
+  .then(function(r){return r.text()})
+  .then(function(code){
+    hideL();
+    openMo('<div style="font-weight:600;margin-bottom:8px;font-size:16px">📄 '+name+'</div><pre style="background:var(--g100);padding:14px;border-radius:8px;max-height:60vh;overflow:auto;font-size:13px;line-height:1.5;white-space:pre-wrap;direction:ltr;text-align:left">'+code.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre><div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-pri" onclick="closeMo();editWorker(\''+name+'\')">✏️ ادیت</button><button class="btn btn-out" onclick="closeMo()">'+t('cancel')+'</button></div>');
+  }).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()});
+}
+function deleteWorker(name){
+  if(!S.zone||!confirm(t('deleteConfirm')))return;
+  var accId=S.zone.account&&S.zone.account.id;if(!accId)return;
+  showL();
+  fetch(PROXY+'/accounts/'+accId+'/workers/scripts/'+name,{method:'DELETE',headers:hdrs()})
+  .then(function(r){return r.json()}).then(function(d){if(d.success){toast(t('deleted'),'ok');loadWorkers()}else{toast(t('error'),'err');hideL()}}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()});
+}
+function deleteWorkerRoute(id){
+  if(!S.zone||!confirm(t('deleteConfirm')))return;showL();
+  fetch(PROXY+'/zones/'+S.zone.id+'/workers/routes/'+id,{method:'DELETE',headers:hdrs()})
+  .then(function(r){return r.json()}).then(function(d){if(d.success){toast(t('deleted'),'ok');loadWorkers()}else{toast(t('error'),'err');hideL()}}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()});
 }
 
-async function selectZone(zone) {
-  S.zone = zone;
-  renderZoneInfo();
-  await loadDNS();
-}
-
-function renderZoneInfo() {
-  const z = S.zone;
-  if (!z) return;
-  const statusMap = { active: ['فعال','active'], pending: ['در انتظار','pending'], moved: ['منتقل شده','inactive'] };
-  const [stText, stClass] = statusMap[z.status] || [z.status, 'inactive'];
-  const ns = z.name_servers?.map(n=>`<code style="font-size:12px">${n}</code>`).join('<br>') || '—';
-
-  $('zoneInfoBody').innerHTML = `
-    <div class="info-row"><span class="info-label">دامنه</span><span class="info-value">${z.name}</span></div>
-    <div class="info-row"><span class="info-label">وضعیت</span><span><span class="status ${stClass}"><span class="status-dot"></span>${stText}</span></span></div>
-    <div class="info-row"><span class="info-label">پلن</span><span class="info-value">${z.plan?.name||'Free'}</span></div>
-    <div class="info-row"><span class="info-label">نیم‌سرورها</span><span class="info-value">${ns}</span></div>
-    <div class="info-row"><span class="info-label">شناسه</span><span class="info-value text-xs">${z.id}</span></div>
-    <div class="mt-16">
-      <button class="btn btn-primary" onclick="switchTab('dns')">مدیریت DNS</button>
-    </div>
-  `;
-}
-
-/* ═══════════ DNS ═══════════ */
-async function loadDNS() {
-  if (!S.zone) return;
-  showLoad();
-  try {
-    let all = [], p = 1;
-    do {
-      const d = await cf(`/zones/${S.zone.id}/dns_records?per_page=100&page=${p}`);
-      all = all.concat(d.result);
-      if (p >= (d.result_info?.total_pages||1)) break;
-      p++;
-    } while(true);
-    S.dns = all;
-    $('dnsCount').textContent = all.length;
-    renderDNSFilters();
-    renderDNSTable();
-  } catch(e) {
-    toast('خطا: ' + e.message, 'error');
-  }
-  hideLoad();
-}
-
-function renderDNSFilters() {
-  const types = {};
-  S.dns.forEach(r=>{ types[r.type]=(types[r.type]||0)+1; });
-  let html = '<div class="filter-pills">';
-  html += `<button class="filter-pill ${S.filter===''?'active':''}" onclick="setFilter('')">همه (${S.dns.length})</button>`;
-  Object.keys(types).sort().forEach(t => {
-    html += `<button class="filter-pill ${S.filter===t?'active':''}" onclick="setFilter('${t}')">${t} (${types[t]})</button>`;
+/* ══════ EMAIL ROUTING ══════ */
+function loadEmail(){
+  if(!S.zone)return;
+  $('emailArea').innerHTML='<div class="skeleton" style="height:120px"></div>';
+  showL();
+  var zid=S.zone.id;
+  Promise.all([
+    cf('/zones/'+zid+'/email/routing').catch(function(){return{result:{enabled:false}}}),
+    cf('/zones/'+zid+'/email/routing/rules').catch(function(){return{result:[]}})
+  ]).then(function(res){
+    var settings=res[0].result||{};
+    var rules=res[1].result||[];
+    var enabled=settings.enabled;
+    var h='<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid var(--g200);border-radius:8px;margin-bottom:12px">';
+    h+='<span>'+(enabled?'🟢 '+t('emailEnabled'):'🔴 '+t('emailDisabled'))+'</span>';
+    h+='<button class="btn btn-sm '+(enabled?'btn-out':'btn-pri')+'" onclick="toggleEmail(\''+(enabled?'disable':'enable')+'\')">'+t(enabled?'disable':'enable')+'</button>';
+    h+='</div>';
+    if(rules.length){
+      h+='<div style="display:flex;flex-direction:column;gap:6px">';
+      rules.forEach(function(r){
+        var matchers=r.matchers.map(function(m){return m.value||m.type}).join(', ');
+        var actions=r.actions.map(function(a){var v=a.value;return Array.isArray(v)?v.join(', '):(v||a.type)}).join(', ');
+        var active=r.enabled!==false;
+        h+='<div style="border:1px solid var(--g200);border-radius:8px;padding:10px 12px">';
+        h+='<span style="color:'+(active?'var(--cf-green)':'var(--g400)')+';font-size:10px">●</span> ';
+        h+='<code style="font-size:12px">'+matchers+'</code>';
+        h+='<div style="font-size:12px;color:var(--g500);margin-top:2px">→ '+actions+'</div></div>';
+      });
+      h+='</div>';
+    } else {
+      h+='<div style="text-align:center;color:var(--g500);padding:12px">'+t('noRules')+'</div>';
+    }
+    $('emailArea').innerHTML=h;
+    hideL();
   });
-  html += '</div>';
-  $('dnsFilterArea').innerHTML = html;
+}
+function toggleEmail(action){
+  if(!S.zone)return;showL();
+  fetch(PROXY+'/zones/'+S.zone.id+'/email/routing/'+action,{method:'POST',headers:hdrs(),body:JSON.stringify({})})
+  .then(function(r){return r.json()}).then(function(d){if(d.success){toast('✅','ok');loadEmail()}else{toast(t('error')+': '+(d.errors&&d.errors[0]&&d.errors[0].message||''),'err');hideL()}}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()});
 }
 
-function setFilter(type) {
-  S.filter = type;
-  renderDNSFilters();
-  renderDNSTable();
-}
+/* ══════ DEPLOY ══════ */
+function renderDeploy(){
+  var isFA=L==='fa';
+  var h='<div style="padding:4px 0">';
 
-function renderDNSTable() {
-  const records = S.filter ? S.dns.filter(r=>r.type===S.filter) : S.dns;
+  h+='<div style="margin-bottom:16px"><div style="font-size:14px;color:var(--g600)">'+(isFA?'ربات EazyFlare خودتون رو روی سرور شخصی نصب کنید.':'Install your own EazyFlare bot on your personal server.')+'</div></div>';
 
-  if (!records.length) {
-    $('dnsTableArea').innerHTML = `
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/></svg>
-        <h3>رکوردی یافت نشد</h3>
-        <p>هنوز رکورد DNS‌ای اضافه نشده است.</p>
-        <button class="btn btn-primary" onclick="openAddModal()">افزودن رکورد</button>
-      </div>`;
-    return;
-  }
+  // Method 1: Bot
+  h+='<div style="background:var(--cf-blue-50);border:1px solid var(--cf-blue-100);border-radius:10px;padding:16px;margin-bottom:14px">';
+  h+='<div style="font-weight:700;font-size:15px;margin-bottom:8px">🤖 '+(isFA?'روش ۱ — از طریق ربات (پیشنهادی)':'Method 1 — Via Bot (Recommended)')+'</div>';
+  h+='<div style="font-size:13px;color:var(--g600);margin-bottom:10px">'+(isFA?'دستور زیر رو تو چت ربات بفرستید:':'Send this command in the bot chat:')+'</div>';
+  h+='<div style="background:var(--g900);color:var(--cf-green);border-radius:8px;padding:12px;font-family:monospace;font-size:14px;direction:ltr;text-align:left;cursor:pointer" onclick="copyCmd(\'/deploy\')">/deploy</div>';
+  h+='<div style="font-size:12px;color:var(--g500);margin-top:8px">'+(isFA?'ربات مرحله به مرحله IP سرور، اطلاعات SSH و توکن ربات رو می‌گیره و خودکار نصب می‌کنه.':'The bot will guide you step by step — server IP, SSH credentials, bot token — and install automatically.')+'</div>';
+  h+='</div>';
 
-  let html = `<table class="dns-table"><thead><tr>
-    <th>نوع</th><th class="ltr">نام</th><th class="ltr">محتوا</th>
-    <th>پروکسی</th><th>TTL</th><th>عملیات</th>
-  </tr></thead><tbody>`;
+  // Method 2: One-liner
+  h+='<div style="background:var(--g50);border:1px solid var(--g200);border-radius:10px;padding:16px;margin-bottom:14px">';
+  h+='<div style="font-weight:700;font-size:15px;margin-bottom:8px">⚡ '+(isFA?'روش ۲ — نصب مستقیم روی سرور':'Method 2 — Direct Install on Server')+'</div>';
+  h+='<div style="font-size:13px;color:var(--g600);margin-bottom:10px">'+(isFA?'این دستور رو مستقیم تو ترمینال سرورتون اجرا کنید:':'Run this command directly on your server terminal:')+'</div>';
+  h+='<div style="background:var(--g900);color:var(--cf-green);border-radius:8px;padding:12px;font-family:monospace;font-size:12px;direction:ltr;text-align:left;cursor:pointer;word-break:break-all" onclick="copyCmd(this.textContent)">curl -fsSL https://raw.githubusercontent.com/Schmi7zz/EazyFlare/main/install.sh | bash</div>';
+  h+='<div style="font-size:12px;color:var(--g500);margin-top:8px">'+(isFA?'Docker یا Systemd رو انتخاب می‌کنید و توکن ربات رو وارد می‌کنید.':'Choose Docker or Systemd and enter your bot token.')+'</div>';
+  h+='</div>';
 
-  records.forEach(r => {
-    const proxy = r.proxied
-      ? `<span class="proxy-icon on"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>فعال</span>`
-      : `<span class="proxy-icon off"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>خاموش</span>`;
-    const ttl = r.ttl === 1 ? 'خودکار' : (r.ttl >= 3600 ? `${r.ttl/3600}h` : `${r.ttl}s`);
-    const nameShort = r.name.replace(`.${S.zone.name}`, '') || '@';
-    const contentShort = r.content.length > 45 ? r.content.substring(0,45)+'…' : r.content;
-
-    html += `<tr>
-      <td><span class="type-badge ${r.type}">${r.type}</span></td>
-      <td class="ltr"><span class="name-cell">${nameShort}</span></td>
-      <td class="ltr"><span class="content-cell" title="${r.content}">${contentShort}</span></td>
-      <td>${['A','AAAA','CNAME'].includes(r.type) ? proxy : '—'}</td>
-      <td><span class="ttl-cell">${ttl}</span></td>
-      <td><div class="actions-cell">
-        <button class="action-btn" onclick="openEditModal('${r.id}')" title="ویرایش">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        </button>
-        <button class="action-btn danger" onclick="confirmDelete('${r.id}','${r.name.replace(/'/g,"\\'")}')" title="حذف">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        </button>
-      </div></td>
-    </tr>`;
+  // Prerequisites
+  h+='<div style="border:1px solid var(--g200);border-radius:10px;padding:16px">';
+  h+='<div style="font-weight:700;font-size:14px;margin-bottom:10px">📋 '+(isFA?'پیش‌نیازها':'Prerequisites')+'</div>';
+  var items=isFA?['سرور لینوکسی (Ubuntu/Debian)','دسترسی SSH یا ترمینال','توکن ربات تلگرام از @BotFather','(اختیاری) دامنه برای مینی‌اپ']:['Linux server (Ubuntu/Debian)','SSH or terminal access','Telegram bot token from @BotFather','(Optional) Domain for mini app'];
+  items.forEach(function(item){
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;color:var(--g600)"><span style="color:var(--cf-green)">✓</span> '+item+'</div>';
   });
+  h+='</div>';
 
-  html += '</tbody></table>';
-  $('dnsTableArea').innerHTML = html;
+  h+='</div>';
+  $('deployArea').innerHTML=h;
+}
+function copyCmd(txt){
+  navigator.clipboard.writeText(txt).then(function(){toast('📋 Copied!','ok')}).catch(function(){});
 }
 
-/* ═══════════ ADD RECORD ═══════════ */
-function openAddModal() {
-  openModal(`
-    <div class="modal-title">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cf-blue-600)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      افزودن رکورد DNS
-    </div>
-    <div class="form-group">
-      <label class="form-label">نوع</label>
-      <select class="form-select" id="addType" onchange="onAddTypeChange()">
-        <option value="A">A — آدرس IPv4</option>
-        <option value="AAAA">AAAA — آدرس IPv6</option>
-        <option value="CNAME">CNAME — نام متعارف</option>
-        <option value="MX">MX — سرور ایمیل</option>
-        <option value="TXT">TXT — متن</option>
-        <option value="NS">NS — نیم‌سرور</option>
-        <option value="SRV">SRV — سرویس</option>
-        <option value="CAA">CAA — مجوز CA</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">نام</label>
-      <input class="form-input" id="addName" value="@" placeholder="@ برای ریشه دامنه" />
-      <div class="form-hint">.${S.zone?.name||''}</div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">محتوا</label>
-      <input class="form-input" id="addContent" placeholder="1.2.3.4" />
-    </div>
-    <div class="form-group" id="addPriGrp" style="display:none">
-      <label class="form-label">اولویت (Priority)</label>
-      <input class="form-input" id="addPriority" type="number" value="10" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">TTL</label>
-      <select class="form-select" id="addTTL">
-        <option value="1">خودکار</option>
-        <option value="60">1 دقیقه</option>
-        <option value="300">5 دقیقه</option>
-        <option value="3600">1 ساعت</option>
-        <option value="86400">1 روز</option>
-      </select>
-    </div>
-    <div class="form-group" id="addProxyGrp">
-      <div class="form-toggle" onclick="toggleProxy('addProxy')">
-        <div class="toggle-track on" id="addProxyTrack"><div class="toggle-handle"></div></div>
-        <span class="toggle-label">پروکسی Cloudflare (ابر نارنجی)</span>
-      </div>
-      <input type="hidden" id="addProxy" value="true" />
-    </div>
-    <div class="btn-group mt-16">
-      <button class="btn btn-primary" onclick="submitAdd()" style="flex:1">ذخیره رکورد</button>
-      <button class="btn btn-outline" onclick="closeModal()">انصراف</button>
-    </div>
-  `);
+function loadDNS(){if(!S.zone)return;showL();var all=[],p=1;function lp(){cf('/zones/'+S.zone.id+'/dns_records?per_page=100&page='+p).then(function(d){all=all.concat(d.result);var tp=(d.result_info&&d.result_info.total_pages)||1;if(p<tp){p++;lp()}else{S.dns=all;$('dnsCount').textContent=all.length;renderFilters();renderTable();hideL()}}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()})}lp()}
+function renderFilters(){var tc={};S.dns.forEach(function(r){tc[r.type]=(tc[r.type]||0)+1});var h='<div class="f-pills"><button class="f-pill '+(S.filter===''?'active':'')+'" onclick="setF(\'\')">'+t('all')+' ('+S.dns.length+')</button>';Object.keys(tc).sort().forEach(function(tp){h+='<button class="f-pill '+(S.filter===tp?'active':'')+'" onclick="setF(\''+tp+'\')">'+tp+' ('+tc[tp]+')</button>'});h+='</div>';$('dnsFilters').innerHTML=h}
+function setF(tp){S.filter=tp;renderFilters();renderTable()}
+
+function renderTable(){
+  var recs=S.filter?S.dns.filter(function(r){return r.type===S.filter}):S.dns;
+  if(!recs.length){$('dnsArea').innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/></svg><h3>'+t('noRecords')+'</h3><p>'+t('noRecordsDesc')+'</p><button class="btn btn-pri" onclick="openAddModal()">'+t('addRecord')+'</button></div>';return}
+  var h='<table class="dns-table"><thead><tr><th>'+t('type')+'</th><th>'+t('name')+'</th><th>'+t('content')+'</th><th>'+t('proxy')+'</th><th>'+t('ttl')+'</th><th>'+t('actions')+'</th></tr></thead><tbody>';
+  recs.forEach(function(r){var px=r.proxied?'<span class="px-icon on"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>'+t('on')+'</span>':'<span class="px-icon off"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>'+t('off')+'</span>';var ttl=r.ttl===1?t('auto'):(r.ttl>=3600?Math.floor(r.ttl/3600)+'h':r.ttl+'s');var nm=r.name.replace('.'+S.zone.name,'')||'@';var ct=r.content.length>45?r.content.substring(0,45)+'…':r.content;var canPx=['A','AAAA','CNAME'].indexOf(r.type)!==-1;
+  h+='<tr><td><span class="tbadge '+r.type+'">'+r.type+'</span></td><td><span class="n-cell">'+nm+'</span></td><td><span class="c-cell" title="'+r.content+'">'+ct+'</span></td><td>'+(canPx?px:'—')+'</td><td><span class="t-cell">'+ttl+'</span></td><td><div class="a-cell"><button class="abtn" onclick="openEditMo(\''+r.id+'\')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="abtn danger" onclick="confirmDel(\''+r.id+"','"+r.name.replace(/'/g,"\\'")+'\')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div></td></tr>'});
+  h+='</tbody></table>';$('dnsArea').innerHTML=h;
 }
 
-function onAddTypeChange() {
-  const t = $('addType')?.value;
-  if (!t) return;
-  const pg = $('addPriGrp');
-  const pxg = $('addProxyGrp');
-  if(pg) pg.style.display = ['MX','SRV'].includes(t) ? 'block' : 'none';
-  if(pxg) pxg.style.display = ['A','AAAA','CNAME'].includes(t) ? 'block' : 'none';
-  const ph = {A:'1.2.3.4',AAAA:'2001:db8::1',CNAME:'example.com',MX:'mail.example.com',TXT:'v=spf1 ...',NS:'ns1.example.com',SRV:'0 5 5060 sip.example.com',CAA:'0 issue "letsencrypt.org"'};
-  const ci = $('addContent');
-  if(ci) ci.placeholder = ph[t]||'';
+function openAddModal(){
+  var phs={A:t('ipv4ph'),AAAA:t('ipv6ph'),CNAME:t('cnamePh'),MX:t('mxPh'),TXT:t('txtPh'),NS:t('nsPh'),SRV:t('srvPh'),CAA:t('caaPh')};
+  openMo('<div class="mo-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cf-blue-600)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'+t('addRecord')+'</div><div class="fg"><label class="fl">'+t('recType')+'</label><select class="fs" id="aType" onchange="onATC()"><option value="A">A</option><option value="AAAA">AAAA</option><option value="CNAME">CNAME</option><option value="MX">MX</option><option value="TXT">TXT</option><option value="NS">NS</option><option value="SRV">SRV</option><option value="CAA">CAA</option></select></div><div class="fg"><label class="fl">'+t('recName')+'</label><input class="fi" id="aName" value="@" placeholder="@"/><div class="fh">'+t('rootHint')+' — .'+S.zone.name+'</div></div><div class="fg"><label class="fl">'+t('recContent')+'</label><input class="fi" id="aCont" placeholder="'+phs.A+'"/></div><div class="fg" id="aPriGrp" style="display:none"><label class="fl">'+t('priority')+'</label><input class="fi" id="aPri" type="number" value="10"/></div><div class="fg"><label class="fl">TTL</label><select class="fs" id="aTTL"><option value="1">'+t('auto')+'</option><option value="60">'+t('min1')+'</option><option value="300">'+t('min5')+'</option><option value="3600">'+t('hour1')+'</option><option value="86400">'+t('day1')+'</option></select></div><div class="fg" id="aPxGrp"><div class="ftg" onclick="tgl(\'aPx\')"><div class="tg-track on" id="aPxT"><div class="tg-knob"></div></div><span class="tg-label">'+t('proxyLabel')+'</span></div><input type="hidden" id="aPx" value="true"/></div><div class="btn-group mt-16"><button class="btn btn-pri" onclick="submitAdd()" style="flex:1">'+t('save')+'</button><button class="btn btn-out" onclick="closeMo()">'+t('cancel')+'</button></div>');
 }
+function onATC(){var tp=$('aType')?$('aType').value:'';if(!tp)return;var pg=$('aPriGrp'),pxg=$('aPxGrp'),ci=$('aCont');if(pg)pg.style.display=['MX','SRV'].indexOf(tp)!==-1?'block':'none';if(pxg)pxg.style.display=['A','AAAA','CNAME'].indexOf(tp)!==-1?'block':'none';var phs={A:t('ipv4ph'),AAAA:t('ipv6ph'),CNAME:t('cnamePh'),MX:t('mxPh'),TXT:t('txtPh'),NS:t('nsPh'),SRV:t('srvPh'),CAA:t('caaPh')};if(ci)ci.placeholder=phs[tp]||''}
+function tgl(id){var i=$(id),tr=$(id+'T');var on=i.value==='true';i.value=on?'false':'true';tr.classList.toggle('on',!on)}
+function submitAdd(){var type=$('aType').value;var name=$('aName').value.trim();var content=$('aCont').value.trim();var ttl=parseInt($('aTTL').value);var proxied=$('aPx')?$('aPx').value==='true':false;var priority=parseInt($('aPri')?$('aPri').value:'10')||10;if(!content){toast(t('errToken'),'err');return}if(name==='@')name=S.zone.name;else if(name.indexOf(S.zone.name)===-1)name=name+'.'+S.zone.name;var body={type:type,name:name,content:content,ttl:ttl};if(['A','AAAA','CNAME'].indexOf(type)!==-1)body.proxied=proxied;if(['MX','SRV'].indexOf(type)!==-1)body.priority=priority;closeMo();showL();cf('/zones/'+S.zone.id+'/dns_records',{method:'POST',body:JSON.stringify(body)}).then(function(){toast(t('created'),'ok');loadDNS()}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()})}
 
-function toggleProxy(inputId) {
-  const input = $(inputId);
-  const track = $(inputId + 'Track');
-  const on = input.value === 'true';
-  input.value = on ? 'false' : 'true';
-  track.classList.toggle('on', !on);
-}
+function openEditMo(id){var r=S.dns.find(function(x){return x.id===id});if(!r)return;var ip=['A','AAAA','CNAME'].indexOf(r.type)!==-1;var hp=['MX','SRV'].indexOf(r.type)!==-1;var h='<div class="mo-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cf-blue-600)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'+t('editRecord')+' '+r.type+'</div>';h+='<div class="fg"><label class="fl">'+t('type')+'</label><input class="fi" value="'+r.type+'" disabled/></div>';h+='<div class="fg"><label class="fl">'+t('name')+'</label><input class="fi" id="eName" value="'+r.name+'"/></div>';h+='<div class="fg"><label class="fl">'+t('content')+'</label><input class="fi" id="eCont" value="'+r.content+'"/></div>';if(hp)h+='<div class="fg"><label class="fl">'+t('priority')+'</label><input class="fi" id="ePri" type="number" value="'+(r.priority||10)+'"/></div>';h+='<div class="fg"><label class="fl">TTL</label><select class="fs" id="eTTL"><option value="1" '+(r.ttl===1?'selected':'')+'>'+t('auto')+'</option><option value="300" '+(r.ttl===300?'selected':'')+'>'+t('min5')+'</option><option value="3600" '+(r.ttl===3600?'selected':'')+'>'+t('hour1')+'</option><option value="86400" '+(r.ttl===86400?'selected':'')+'>'+t('day1')+'</option></select></div>';if(ip)h+='<div class="fg"><div class="ftg" onclick="tgl(\'ePx\')"><div class="tg-track '+(r.proxied?'on':'')+'" id="ePxT"><div class="tg-knob"></div></div><span class="tg-label">'+t('proxyLabel')+'</span></div><input type="hidden" id="ePx" value="'+r.proxied+'"/></div>';h+='<div class="btn-group mt-16"><button class="btn btn-pri" onclick="submitEdit(\''+id+"','"+r.type+'\')" style="flex:1">'+t('save')+'</button><button class="btn btn-out" onclick="closeMo()">'+t('cancel')+'</button></div>';openMo(h)}
+function submitEdit(id,type){var name=$('eName').value.trim(),content=$('eCont').value.trim(),ttl=parseInt($('eTTL').value);var proxied=$('ePx')?$('ePx').value==='true':false;var priority=$('ePri')?parseInt($('ePri').value):undefined;if(!content){toast(t('errToken'),'err');return}var body={type:type,name:name,content:content,ttl:ttl};if(['A','AAAA','CNAME'].indexOf(type)!==-1)body.proxied=proxied;if(priority!==undefined)body.priority=priority;closeMo();showL();cf('/zones/'+S.zone.id+'/dns_records/'+id,{method:'PUT',body:JSON.stringify(body)}).then(function(){toast(t('updated'),'ok');loadDNS()}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()})}
+function confirmDel(id,name){openMo('<div class="mo-title" style="color:var(--cf-red)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'+t('deleteRecord')+'</div><p style="font-size:14px;color:var(--g600);margin-bottom:8px">'+t('deleteConfirm')+'</p><div style="background:var(--g50);border-radius:8px;padding:12px;margin-bottom:16px;direction:ltr;text-align:left;font-family:monospace;font-size:13px">'+name+'</div><p style="font-size:12px;color:var(--cf-red);margin-bottom:16px">⚠️ '+t('deleteWarn')+'</p><div class="btn-group"><button class="btn btn-dng" onclick="doDel(\''+id+'\')" style="flex:1">'+t('delete')+'</button><button class="btn btn-out" onclick="closeMo()">'+t('cancel')+'</button></div>')}
+function doDel(id){closeMo();showL();cf('/zones/'+S.zone.id+'/dns_records/'+id,{method:'DELETE'}).then(function(){toast(t('deleted'),'ok');loadDNS()}).catch(function(e){toast(t('error')+': '+e.message,'err');hideL()})}
+function refreshView(){if(S.tab==='dns')loadDNS();else if(S.zone)selectZone(S.zone)}
 
-async function submitAdd() {
-  const type = $('addType').value;
-  let name = $('addName').value.trim();
-  const content = $('addContent').value.trim();
-  const ttl = parseInt($('addTTL').value);
-  const proxied = $('addProxy')?.value === 'true';
-  const priority = parseInt($('addPriority')?.value) || 10;
-
-  if (!content) { toast('لطفاً محتوا را وارد کنید', 'error'); return; }
-  if (name === '@') name = S.zone.name;
-  else if (!name.endsWith(S.zone.name)) name = `${name}.${S.zone.name}`;
-
-  const body = { type, name, content, ttl };
-  if (['A','AAAA','CNAME'].includes(type)) body.proxied = proxied;
-  if (['MX','SRV'].includes(type)) body.priority = priority;
-
-  closeModal();
-  showLoad();
-  try {
-    await cf(`/zones/${S.zone.id}/dns_records`, { method: 'POST', body: JSON.stringify(body) });
-    toast('رکورد ایجاد شد!', 'success');
-    await loadDNS();
-  } catch(e) {
-    toast('خطا: ' + e.message, 'error');
-  }
-  hideLoad();
-}
-
-/* ═══════════ EDIT RECORD ═══════════ */
-function openEditModal(id) {
-  const r = S.dns.find(x=>x.id===id);
-  if (!r) return;
-  const ip = ['A','AAAA','CNAME'].includes(r.type);
-  const hp = ['MX','SRV'].includes(r.type);
-
-  openModal(`
-    <div class="modal-title">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cf-blue-600)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      ویرایش رکورد ${r.type}
-    </div>
-    <div class="form-group">
-      <label class="form-label">نوع</label>
-      <input class="form-input" value="${r.type}" disabled style="opacity:0.5" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">نام</label>
-      <input class="form-input" id="editName" value="${r.name}" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">محتوا</label>
-      <input class="form-input" id="editContent" value="${r.content}" />
-    </div>
-    ${hp ? `<div class="form-group"><label class="form-label">اولویت</label><input class="form-input" id="editPri" type="number" value="${r.priority||10}" /></div>` : ''}
-    <div class="form-group">
-      <label class="form-label">TTL</label>
-      <select class="form-select" id="editTTL">
-        <option value="1" ${r.ttl===1?'selected':''}>خودکار</option>
-        <option value="60" ${r.ttl===60?'selected':''}>1 دقیقه</option>
-        <option value="300" ${r.ttl===300?'selected':''}>5 دقیقه</option>
-        <option value="3600" ${r.ttl===3600?'selected':''}>1 ساعت</option>
-        <option value="86400" ${r.ttl===86400?'selected':''}>1 روز</option>
-      </select>
-    </div>
-    ${ip ? `
-    <div class="form-group">
-      <div class="form-toggle" onclick="toggleProxy('editProxy')">
-        <div class="toggle-track ${r.proxied?'on':''}" id="editProxyTrack"><div class="toggle-handle"></div></div>
-        <span class="toggle-label">پروکسی Cloudflare</span>
-      </div>
-      <input type="hidden" id="editProxy" value="${r.proxied}" />
-    </div>` : ''}
-    <div class="btn-group mt-16">
-      <button class="btn btn-primary" onclick="submitEdit('${id}','${r.type}')" style="flex:1">ذخیره تغییرات</button>
-      <button class="btn btn-outline" onclick="closeModal()">انصراف</button>
-    </div>
-  `);
-}
-
-async function submitEdit(id, type) {
-  const name = $('editName').value.trim();
-  const content = $('editContent').value.trim();
-  const ttl = parseInt($('editTTL').value);
-  const proxied = $('editProxy')?.value === 'true';
-  const priority = parseInt($('editPri')?.value) || undefined;
-
-  if (!content) { toast('محتوا نمی‌تواند خالی باشد', 'error'); return; }
-  const body = { type, name, content, ttl };
-  if (['A','AAAA','CNAME'].includes(type)) body.proxied = proxied;
-  if (priority !== undefined) body.priority = priority;
-
-  closeModal(); showLoad();
-  try {
-    await cf(`/zones/${S.zone.id}/dns_records/${id}`, { method: 'PUT', body: JSON.stringify(body) });
-    toast('رکورد بروزرسانی شد!', 'success');
-    await loadDNS();
-  } catch(e) { toast('خطا: ' + e.message, 'error'); }
-  hideLoad();
-}
-
-/* ═══════════ DELETE ═══════════ */
-function confirmDelete(id, name) {
-  openModal(`
-    <div class="modal-title" style="color:var(--cf-red)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-      حذف رکورد
-    </div>
-    <p style="font-size:14px;color:var(--cf-gray-600);margin-bottom:8px">آیا از حذف رکورد زیر اطمینان دارید؟</p>
-    <div style="background:var(--cf-gray-50);border-radius:8px;padding:12px;margin-bottom:16px;direction:ltr;text-align:left;font-family:monospace;font-size:13px;color:var(--cf-gray-700)">${name}</div>
-    <p style="font-size:12px;color:var(--cf-red);margin-bottom:16px">⚠️ این عمل قابل بازگشت نیست.</p>
-    <div class="btn-group">
-      <button class="btn btn-danger" onclick="doDelete('${id}')" style="flex:1">حذف رکورد</button>
-      <button class="btn btn-outline" onclick="closeModal()">انصراف</button>
-    </div>
-  `);
-}
-
-async function doDelete(id) {
-  closeModal(); showLoad();
-  try {
-    await cf(`/zones/${S.zone.id}/dns_records/${id}`, { method: 'DELETE' });
-    toast('رکورد حذف شد!', 'success');
-    await loadDNS();
-  } catch(e) { toast('خطا: ' + e.message, 'error'); }
-  hideLoad();
-}
-
-/* ═══════════ REFRESH ═══════════ */
-function refreshCurrentView() {
-  if (S.activeTab === 'dns') loadDNS();
-  else if (S.zone) selectZone(S.zone);
-}
-
-/* ═══════════ TELEGRAM + INIT ═══════════ */
-try {
-  if (window.Telegram?.WebApp) {
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
-    tg.MainButton.hide();
-  }
-} catch(e) {}
-
-// Auto-login from localStorage
-const saved = localStorage.getItem('cf_auth');
-if (saved) {
-  try {
-    const d = JSON.parse(saved);
-    S.auth = d.auth; S.token = d.token; S.email = d.email;
-    $('loginScreen').style.display = 'none';
-    $('mainApp').style.display = 'block';
-    loadApp();
-  } catch(e) {
-    localStorage.removeItem('cf_auth');
-  }
-}
+/* ══════ INIT ══════ */
+try{if(window.Telegram&&window.Telegram.WebApp){var tg=window.Telegram.WebApp;tg.ready();tg.expand();tg.MainButton.hide()}}catch(e){}
+setLang(L);
+var saved=localStorage.getItem('cf_auth');
+if(saved){try{var d=JSON.parse(saved);S.auth=d.auth;S.token=d.token;S.email=d.email;var vp=S.auth==='token'?'/user/tokens/verify':'/zones?per_page=1';cf(vp).then(function(){enterApp()}).catch(function(){S.token='';S.email='';localStorage.removeItem('cf_auth');$('loginScreen').style.display='flex';$('mainApp').style.display='none'})}catch(e){localStorage.removeItem('cf_auth')}}
 </script>
 </body>
 </html>
