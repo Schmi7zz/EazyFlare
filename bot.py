@@ -1815,7 +1815,7 @@ def main():
 
     app.post_init = post_init
     logger.info("🚀 EazyFlare Bot started!")
-    app.run_polling()
+    app.run_polling(allowed_updates=["message", "callback_query", "inline_query", "chat_member", "my_chat_member"])
 
 if __name__ == "__main__":
     main()
