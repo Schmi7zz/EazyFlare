@@ -1449,9 +1449,11 @@ async def deploy_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await msg.edit_text(text, parse_mode="HTML")
     else:
         await msg.reply_text(text, parse_mode="HTML")
+    logger.info(f"Deploy started, returning DEP_HOST={DEP_HOST}")
     return DEP_HOST
 
 async def deploy_host(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    logger.info(f"deploy_host called with: {update.message.text}")
     ctx.user_data["dep_host"] = update.message.text.strip()
     await update.message.reply_text("پورت SSH (پیش‌فرض 22):\n\nاگه 22 هست فقط <code>22</code> بفرست.", parse_mode="HTML")
     return DEP_PORT
@@ -1661,7 +1663,7 @@ def main():
             CONNECT_KEY: [MessageHandler(filters.TEXT & ~filters.COMMAND, connect_key)],
         },
         fallbacks=[CommandHandler("cancel", connect_cancel_msg), CommandHandler("start", cmd_start)],
-        per_message=True,
+        per_message=False,
         allow_reentry=True,
     )
 
@@ -1674,7 +1676,7 @@ def main():
             ADD_PROXY: [CallbackQueryHandler(add_proxy, pattern="^px_")],
         },
         fallbacks=[CommandHandler("cancel", connect_cancel_msg), CommandHandler("start", cmd_start)],
-        per_message=True,
+        per_message=False,
         allow_reentry=True,
     )
 
@@ -1682,7 +1684,7 @@ def main():
         entry_points=[CallbackQueryHandler(edit_content_entry, pattern=r"^ec_")],
         states={EDIT_VALUE: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_content_value)]},
         fallbacks=[CommandHandler("cancel", connect_cancel_msg), CommandHandler("start", cmd_start)],
-        per_message=True,
+        per_message=False,
         allow_reentry=True,
     )
 
@@ -1698,7 +1700,7 @@ def main():
             PR_ACTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, pr_add_action)],
         },
         fallbacks=[CommandHandler("cancel", connect_cancel_msg), CommandHandler("start", cmd_start)],
-        per_message=True,
+        per_message=False,
         allow_reentry=True,
     )
     app.add_handler(pr_conv)
@@ -1713,7 +1715,7 @@ def main():
             ],
         },
         fallbacks=[CommandHandler("cancel", connect_cancel_msg), CommandHandler("start", cmd_start)],
-        per_message=True,
+        per_message=False,
         allow_reentry=True,
     )
     app.add_handler(wk_conv)
@@ -1738,7 +1740,7 @@ def main():
             DEP_WEBAPP: [MessageHandler(filters.TEXT & ~filters.COMMAND, deploy_webapp)],
         },
         fallbacks=[CommandHandler("cancel", deploy_cancel), CommandHandler("start", cmd_start)],
-        per_message=True,
+        per_message=False,
         allow_reentry=True,
     )
     app.add_handler(deploy_conv)
