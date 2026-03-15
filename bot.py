@@ -1372,9 +1372,13 @@ echo "STEP_3"
 mkdir -p /opt/eazyflare && cd /opt/eazyflare
 REPO="https://raw.githubusercontent.com/Schmi7zz/EazyFlare/main"
 curl -fsSL "$REPO/bot.py" -o bot.py
-curl -fsSL "$REPO/requirements.txt" -o requirements.txt
 curl -fsSL "$REPO/Dockerfile" -o Dockerfile
 curl -fsSL "$REPO/docker-compose.yml" -o docker-compose.yml
+# Create minimal requirements (no paramiko needed on target)
+cat > requirements.txt << REQEOF
+python-telegram-bot==21.5
+requests>=2.31.0
+REQEOF
 echo "STEP_4"
 cat > .env << ENVEOF
 BOT_TOKEN={bot_token}
@@ -1529,91 +1533,94 @@ async def deploy_webapp(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     host = ctx.user_data["dep_host"]
     port = ctx.user_data["dep_port"]
-    bot_token = ctx.user_data["dep_bottoken"]
-    import time
+    import time, queue, threading
     start_time = time.time()
 
-    # Initial message
-    wait = await update.message.reply_text(
-        f"🚀 <b>نصب EazyFlare</b>\n\n"
-        f"🖥 سرور: <code>{host}:{port}</code>\n\n"
-        f"{_make_progress_bar(0)}\n"
-        f"🔌 اتصال به سرور...\n"
-        f"⏱ 0:00",
-        parse_mode="HTML"
-    )
+    def _elapsed():
+        e = int(time.time() - start_time)
+        return f"{e//60}:{e%60:02d}"
 
-    # Connect SSH in thread
+    def _progress_text(pct, msg):
+        return (
+            f"🚀 <b>نصب EazyFlare</b>\n\n"
+            f"🖥 سرور: <code>{host}:{port}</code>\n\n"
+            f"{_make_progress_bar(pct)}\n"
+            f"{msg}\n"
+            f"⏱ {_elapsed()}"
+        )
+
+    wait = await update.message.reply_text(_progress_text(0, "🔌 اتصال به سرور..."), parse_mode="HTML")
+
+    # Connect
     try:
-        client = await asyncio.get_event_loop().run_in_executor(
-            None, _ssh_connect, ctx.user_data
-        )
+        client = await asyncio.get_event_loop().run_in_executor(None, _ssh_connect, ctx.user_data)
     except Exception as e:
-        elapsed = int(time.time() - start_time)
-        await wait.edit_text(
-            f"❌ <b>خطای اتصال SSH</b>\n\n<code>{e}</code>\n⏱ {elapsed//60}:{elapsed%60:02d}",
-            parse_mode="HTML"
-        )
+        await wait.edit_text(f"❌ <b>خطای اتصال SSH</b>\n\n<code>{e}</code>\n⏱ {_elapsed()}", parse_mode="HTML")
         for k in ["dep_password", "dep_key_data", "dep_bottoken"]:
             ctx.user_data.pop(k, None)
         return ConversationHandler.END
 
-    # Update: connected
-    elapsed = int(time.time() - start_time)
-    await wait.edit_text(
-        f"🚀 <b>نصب EazyFlare</b>\n\n"
-        f"🖥 سرور: <code>{host}:{port}</code>\n\n"
-        f"{_make_progress_bar(10)}\n"
-        f"🔌 اتصال SSH برقرار شد\n"
-        f"⏱ {elapsed//60}:{elapsed%60:02d}",
-        parse_mode="HTML"
-    )
+    await wait.edit_text(_progress_text(10, "🔌 اتصال SSH برقرار شد"), parse_mode="HTML")
 
-    # Build and execute script
-    script = DEPLOY_SCRIPT.format(
-        bot_token=ctx.user_data["dep_bottoken"],
-        webapp_url=webapp,
-    )
-
+    # Execute script
+    script = DEPLOY_SCRIPT.format(bot_token=ctx.user_data["dep_bottoken"], webapp_url=webapp)
     stdin, stdout, stderr = client.exec_command("bash -s", timeout=300, get_pty=True)
     stdin.write(script)
     stdin.channel.shutdown_write()
 
-    # Read output line by line in thread, update progress
+    # Read lines in background thread, push to queue
+    q = queue.Queue()
+    def _reader():
+        try:
+            while True:
+                line = stdout.readline(4096)
+                if not line:
+                    break
+                q.put(line.strip())
+        except:
+            pass
+        q.put(None)  # sentinel
+
+    threading.Thread(target=_reader, daemon=True).start()
+
     step_map = {s[0]: (s[1], s[2]) for s in DEPLOY_STEPS}
-    current_pct = 10
-    current_msg = "🔌 اتصال SSH برقرار شد"
-    last_edit = time.time()
+    current_pct, current_msg = 10, "🔌 اتصال SSH برقرار شد"
+    last_pct = 10
 
-    def read_lines():
-        lines = []
-        for line in iter(lambda: stdout.readline(1024), ""):
-            if not line:
-                break
-            lines.append(line.strip())
-        return lines
-
-    output_lines = await asyncio.get_event_loop().run_in_executor(None, read_lines)
-
-    for line in output_lines:
+    # Poll queue and update message
+    while True:
+        try:
+            line = q.get(timeout=0.5)
+        except queue.Empty:
+            continue
+        if line is None:
+            break
         if line in step_map:
             current_pct, current_msg = step_map[line]
+            if current_pct != last_pct:
+                last_pct = current_pct
+                try:
+                    await wait.edit_text(_progress_text(current_pct, current_msg), parse_mode="HTML")
+                except:
+                    pass
+                await asyncio.sleep(0.3)
 
     exit_code = stdout.channel.recv_exit_status()
-    err_out = stderr.read().decode("utf-8", errors="replace")
+    err_out = ""
+    try:
+        err_out = stderr.read().decode("utf-8", errors="replace")
+    except:
+        pass
     client.close()
 
-    elapsed = int(time.time() - start_time)
-    mins, secs = elapsed // 60, elapsed % 60
-
-    if exit_code == 0 and current_pct == 100:
+    if exit_code == 0 and current_pct >= 90:
         await wait.edit_text(
             f"✅ <b>نصب موفق!</b>\n\n"
             f"🖥 سرور: <code>{host}</code>\n"
             f"📁 مسیر: <code>/opt/eazyflare</code>\n"
             f"🐳 Docker: در حال اجرا\n\n"
             f"{_make_progress_bar(100)}\n"
-            f"⏱ {mins}:{secs:02d}\n\n"
+            f"⏱ {_elapsed()}\n\n"
             f"🔧 لاگ:\n<code>docker compose -f /opt/eazyflare/docker-compose.yml logs -f</code>",
             parse_mode="HTML"
         )
@@ -1623,12 +1630,11 @@ async def deploy_webapp(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             f"❌ <b>خطا در نصب</b>\n\n"
             f"{_make_progress_bar(current_pct)}\n"
             f"آخرین مرحله: {current_msg}\n"
-            f"⏱ {mins}:{secs:02d}\n\n"
+            f"⏱ {_elapsed()}\n\n"
             f"<pre>{err_short}</pre>",
             parse_mode="HTML"
         )
 
-    # Cleanup
     for k in ["dep_password", "dep_key_data", "dep_bottoken"]:
         ctx.user_data.pop(k, None)
     return ConversationHandler.END
@@ -1717,6 +1723,9 @@ async def cb_router(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if d.startswith("wk_") or d.startswith("wkd_") or d.startswith("wkv_") or d.startswith("wks_") or d.startswith("wksx_"): return await workers_list(update, ctx)
     if d.startswith("em_") or d.startswith("emt_") or d.startswith("emd_"): return await email_routing(update, ctx)
     if d == "noop":           return await update.callback_query.answer()
+    # Unhandled
+    logger.warning(f"Unhandled callback: {d}")
+    await update.callback_query.answer()
 
 # ━━━━━━━━━━ MAIN ━━━━━━━━━━
 def main():
