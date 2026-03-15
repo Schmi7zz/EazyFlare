@@ -1650,6 +1650,7 @@ def main():
         },
         fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
         per_message=False,
+        allow_reentry=True,
     )
 
     add_conv = ConversationHandler(
@@ -1662,6 +1663,7 @@ def main():
         },
         fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
         per_message=False,
+        allow_reentry=True,
     )
 
     edit_conv = ConversationHandler(
@@ -1669,6 +1671,7 @@ def main():
         states={EDIT_VALUE: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_content_value)]},
         fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
         per_message=False,
+        allow_reentry=True,
     )
 
     app.add_handler(connect_conv)
@@ -1684,6 +1687,7 @@ def main():
         },
         fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
         per_message=False,
+        allow_reentry=True,
     )
     app.add_handler(pr_conv)
 
@@ -1698,6 +1702,7 @@ def main():
         },
         fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
         per_message=False,
+        allow_reentry=True,
     )
     app.add_handler(wk_conv)
 
@@ -1722,6 +1727,7 @@ def main():
         },
         fallbacks=[CommandHandler("cancel", deploy_cancel)],
         per_message=False,
+        allow_reentry=True,
     )
     app.add_handler(deploy_conv)
 
@@ -1739,6 +1745,11 @@ def main():
     app.add_handler(CommandHandler("dns", cmd_domains))
     app.add_handler(CommandHandler("disconnect", cmd_disconnect))
     app.add_handler(CommandHandler("stats", cmd_stats))
+
+    # Standalone callback handlers (must work even during conversations)
+    app.add_handler(CallbackQueryHandler(send_help, pattern="^do_help$"))
+    app.add_handler(CallbackQueryHandler(cmd_disconnect, pattern="^do_disconnect$"))
+    app.add_handler(CallbackQueryHandler(cmd_domains, pattern="^do_domains$"))
 
     # Handle deploy data from mini app
     async def handle_webapp_data(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
