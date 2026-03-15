@@ -28,13 +28,20 @@ from telegram.ext import (
 
 # ━━━━━━━━━━ CONFIG ━━━━━━━━━━
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://eazyflare.vaslima.de")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "").strip()
 CF_API = "https://api.cloudflare.com/client/v4"
 ADMIN_ID = 1028296561
 DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
 
 if not BOT_TOKEN:
     raise ValueError("BOT_TOKEN is required. Set via environment variable or .env file.")
+
+def webapp_btn(text, zid=None):
+    """Return WebApp button only if WEBAPP_URL is set, else None."""
+    if not WEBAPP_URL:
+        return None
+    url = f"{WEBAPP_URL}?zone={zid}" if zid else WEBAPP_URL
+    return InlineKeyboardButton(text, web_app=WebAppInfo(url=url))
 
 logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -176,11 +183,12 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         text += "✅ حساب شما متصل است.\n"
         btns = [
             [InlineKeyboardButton("🌐 دامنه‌های من", callback_data="do_domains")],
-            [InlineKeyboardButton("📊 داشبورد", web_app=WebAppInfo(url=WEBAPP_URL))],
-            [InlineKeyboardButton("📖 راهنما", callback_data="do_help"),
-             InlineKeyboardButton("🔌 قطع", callback_data="do_disconnect")],
-            [InlineKeyboardButton("🚀 نصب روی سرور", callback_data="do_deploy")],
         ]
+        if WEBAPP_URL:
+            btns.append([webapp_btn("📊 داشبورد")])
+        btns.append([InlineKeyboardButton("📖 راهنما", callback_data="do_help"),
+             InlineKeyboardButton("🔌 قطع", callback_data="do_disconnect")])
+        btns.append([InlineKeyboardButton("🚀 نصب روی سرور", callback_data="do_deploy")])
     else:
         text += "برای شروع، حساب Cloudflare خود را متصل کنید:\n"
         btns = [
@@ -301,12 +309,12 @@ async def connect_key(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             cf_get(uid, "/zones", {"per_page": 1})
 
         track_cf_login(uid, update.effective_user.first_name or "")
+        _btns = [[InlineKeyboardButton("🌐 دامنه‌ها", callback_data="do_domains")]]
+        if WEBAPP_URL:
+            _btns.append([webapp_btn("📊 داشبورد")])
         await wait.edit_text(
             "✅ <b>اتصال برقرار شد!</b>", parse_mode="HTML",
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🌐 دامنه‌ها", callback_data="do_domains")],
-                [InlineKeyboardButton("📊 داشبورد", web_app=WebAppInfo(url=WEBAPP_URL))],
-            ]))
+            reply_markup=InlineKeyboardMarkup(_btns))
     except Exception as e:
         del_s(uid)
         await wait.edit_text(
@@ -349,10 +357,10 @@ async def cmd_domains(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             i = ico.get(z["status"], "⚪")
             plan = z.get("plan", {}).get("name", "Free")
             btns.append([InlineKeyboardButton(f"{i} {z['name']}  •  {plan}", callback_data=f"zone_{z['id']}")])
-        btns.append([
-            InlineKeyboardButton("🔄 بروزرسانی", callback_data="do_domains"),
-            InlineKeyboardButton("📊 داشبورد", web_app=WebAppInfo(url=WEBAPP_URL)),
-        ])
+        _last = [InlineKeyboardButton("🔄 بروزرسانی", callback_data="do_domains")]
+        if WEBAPP_URL:
+            _last.append(webapp_btn("📊 داشبورد"))
+        btns.append(_last)
         await wait.edit_text(text, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(btns))
     except Exception as e:
         await wait.edit_text(f"❌ خطا: <code>{e}</code>", parse_mode="HTML")
@@ -382,9 +390,10 @@ async def zone_selected(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
          InlineKeyboardButton("🔀 Page Rules", callback_data=f"pr_{zid}")],
         [InlineKeyboardButton("👷 Workers", callback_data=f"wk_{zid}"),
          InlineKeyboardButton("📧 Email", callback_data=f"em_{zid}")],
-        [InlineKeyboardButton("📊 داشبورد", web_app=WebAppInfo(url=f"{WEBAPP_URL}?zone={zid}"))],
-        [InlineKeyboardButton("🔙 بازگشت", callback_data="do_domains")],
     ]
+    if WEBAPP_URL:
+        btns.append([webapp_btn("📊 داشبورد", zid)])
+    btns.append([InlineKeyboardButton("🔙 بازگشت", callback_data="do_domains")])
     await q.message.edit_text(text, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(btns))
 
 # ━━━━━━━━━━ DNS LIST ━━━━━━━━━━
@@ -430,7 +439,8 @@ async def dns_list(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             if len(row) >= 4: fbtns.append(row); row = []
         if row: fbtns.append(row)
         fbtns.append([InlineKeyboardButton("➕ افزودن", callback_data=f"add_{zid}"), InlineKeyboardButton("🔄", callback_data=f"dns_{zid}")])
-        fbtns.append([InlineKeyboardButton("📊 داشبورد", web_app=WebAppInfo(url=f"{WEBAPP_URL}?zone={zid}"))])
+        if WEBAPP_URL:
+            fbtns.append([webapp_btn("📊 داشبورد", zid)])
         fbtns.append([InlineKeyboardButton("🔙 بازگشت", callback_data=f"zone_{zid}")])
         await q.message.edit_text(text, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(fbtns))
     except Exception as e:
@@ -1338,51 +1348,80 @@ async def email_routing(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     btns.append([InlineKeyboardButton("🔙 بازگشت", callback_data=f"zone_{zid}")])
     await wait.edit_text(text, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(btns))
 
-# ━━━━━━━━━━ DEPLOY VIA SSH (ADMIN) ━━━━━━━━━━
+# ━━━━━━━━━━ DEPLOY VIA SSH ━━━━━━━━━━
+DEPLOY_STEPS = [
+    ("STEP_1", 10, "🔌 اتصال SSH برقرار شد"),
+    ("STEP_2", 25, "🐳 نصب Docker"),
+    ("STEP_3", 40, "📥 دانلود فایل‌ها از GitHub"),
+    ("STEP_4", 55, "⚙️ ساخت فایل تنظیمات"),
+    ("STEP_5", 75, "🔨 ساخت Docker image"),
+    ("STEP_6", 90, "🚀 اجرای کانتینر"),
+    ("DEPLOY_OK", 100, "✅ نصب کامل شد!"),
+]
+
 DEPLOY_SCRIPT = '''#!/bin/bash
 set -e
-
-echo "🚀 Installing EazyFlare..."
-
-# Install Docker if not present
+echo "STEP_2"
 if ! command -v docker &>/dev/null; then
-  echo "📦 Installing Docker..."
-  curl -fsSL https://get.docker.com | sh
+  curl -fsSL https://get.docker.com | sh >/dev/null 2>&1
 fi
-
-# Install Docker Compose plugin if not present
 if ! docker compose version &>/dev/null 2>&1; then
-  echo "📦 Installing Docker Compose..."
-  apt-get update -qq && apt-get install -y -qq docker-compose-plugin 2>/dev/null || true
+  apt-get update -qq >/dev/null 2>&1 && apt-get install -y -qq docker-compose-plugin >/dev/null 2>&1 || true
 fi
-
-# Create directory
+echo "STEP_3"
 mkdir -p /opt/eazyflare && cd /opt/eazyflare
-
-# Download files from GitHub
 REPO="https://raw.githubusercontent.com/Schmi7zz/EazyFlare/main"
 curl -fsSL "$REPO/bot.py" -o bot.py
 curl -fsSL "$REPO/requirements.txt" -o requirements.txt
 curl -fsSL "$REPO/Dockerfile" -o Dockerfile
 curl -fsSL "$REPO/docker-compose.yml" -o docker-compose.yml
-
-# Create .env
+echo "STEP_4"
 cat > .env << ENVEOF
 BOT_TOKEN={bot_token}
 WEBAPP_URL={webapp_url}
 ENVEOF
-
-# Init users.json if not exists
 [ -f users.json ] || echo '{{"users":{{}},"cf_logins":{{}}}}' > users.json
-
-# Build and start
+echo "STEP_5"
 docker compose down 2>/dev/null || true
-docker compose up -d --build
-
-echo "✅ EazyFlare deployed successfully!"
-echo "📁 Directory: /opt/eazyflare"
-echo "🔧 Logs: docker compose -f /opt/eazyflare/docker-compose.yml logs -f"
+docker compose build --no-cache 2>&1 | tail -1
+echo "STEP_6"
+docker compose up -d
+echo "DEPLOY_OK"
 '''
+
+def _make_progress_bar(pct):
+    filled = int(pct / 5)
+    empty = 20 - filled
+    bar = "█" * filled + "░" * empty
+    return f"[{bar}] {pct}%"
+
+def _ssh_connect(data):
+    """Create and return SSH client."""
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    connect_args = {
+        "hostname": data["dep_host"],
+        "port": data["dep_port"],
+        "username": data["dep_user"],
+        "timeout": 15,
+    }
+    if data.get("dep_auth_method") == "pass":
+        connect_args["password"] = data["dep_password"]
+    else:
+        key_data = data.get("dep_key_data", "")
+        key_file = io.StringIO(key_data)
+        try:
+            pkey = paramiko.RSAKey.from_private_key(key_file)
+        except:
+            key_file.seek(0)
+            try:
+                pkey = paramiko.Ed25519Key.from_private_key(key_file)
+            except:
+                key_file.seek(0)
+                pkey = paramiko.ECDSAKey.from_private_key(key_file)
+        connect_args["pkey"] = pkey
+    client.connect(**connect_args)
+    return client
 
 async def deploy_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.callback_query:
@@ -1490,84 +1529,129 @@ async def deploy_webapp(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     host = ctx.user_data["dep_host"]
     port = ctx.user_data["dep_port"]
-    user = ctx.user_data["dep_user"]
     bot_token = ctx.user_data["dep_bottoken"]
+    import time
+    start_time = time.time()
 
-    wait = await update.message.reply_text("⏳ در حال اتصال و نصب...")
-
-    # Run SSH in thread to not block
-    result = await asyncio.get_event_loop().run_in_executor(
-        None, _ssh_deploy, ctx.user_data
+    # Initial message
+    wait = await update.message.reply_text(
+        f"🚀 <b>نصب EazyFlare</b>\n\n"
+        f"🖥 سرور: <code>{host}:{port}</code>\n\n"
+        f"{_make_progress_bar(0)}\n"
+        f"🔌 اتصال به سرور...\n"
+        f"⏱ 0:00",
+        parse_mode="HTML"
     )
 
-    if result["success"]:
-        text = (
+    # Connect SSH in thread
+    try:
+        client = await asyncio.get_event_loop().run_in_executor(
+            None, _ssh_connect, ctx.user_data
+        )
+    except Exception as e:
+        elapsed = int(time.time() - start_time)
+        await wait.edit_text(
+            f"❌ <b>خطای اتصال SSH</b>\n\n<code>{e}</code>\n⏱ {elapsed//60}:{elapsed%60:02d}",
+            parse_mode="HTML"
+        )
+        for k in ["dep_password", "dep_key_data", "dep_bottoken"]:
+            ctx.user_data.pop(k, None)
+        return ConversationHandler.END
+
+    # Update: connected
+    elapsed = int(time.time() - start_time)
+    await wait.edit_text(
+        f"🚀 <b>نصب EazyFlare</b>\n\n"
+        f"🖥 سرور: <code>{host}:{port}</code>\n\n"
+        f"{_make_progress_bar(10)}\n"
+        f"🔌 اتصال SSH برقرار شد\n"
+        f"⏱ {elapsed//60}:{elapsed%60:02d}",
+        parse_mode="HTML"
+    )
+
+    # Build and execute script
+    script = DEPLOY_SCRIPT.format(
+        bot_token=ctx.user_data["dep_bottoken"],
+        webapp_url=webapp,
+    )
+
+    stdin, stdout, stderr = client.exec_command("bash -s", timeout=300, get_pty=True)
+    stdin.write(script)
+    stdin.channel.shutdown_write()
+
+    # Read output line by line in thread, update progress
+    step_map = {s[0]: (s[1], s[2]) for s in DEPLOY_STEPS}
+    current_pct = 10
+    current_msg = "🔌 اتصال SSH برقرار شد"
+    last_edit = time.time()
+
+    def read_lines():
+        lines = []
+        for line in iter(lambda: stdout.readline(1024), ""):
+            if not line:
+                break
+            lines.append(line.strip())
+        return lines
+
+    output_lines = await asyncio.get_event_loop().run_in_executor(None, read_lines)
+
+    for line in output_lines:
+        if line in step_map:
+            current_pct, current_msg = step_map[line]
+
+    exit_code = stdout.channel.recv_exit_status()
+    err_out = stderr.read().decode("utf-8", errors="replace")
+    client.close()
+
+    elapsed = int(time.time() - start_time)
+    mins, secs = elapsed // 60, elapsed % 60
+
+    if exit_code == 0 and current_pct == 100:
+        await wait.edit_text(
             f"✅ <b>نصب موفق!</b>\n\n"
             f"🖥 سرور: <code>{host}</code>\n"
             f"📁 مسیر: <code>/opt/eazyflare</code>\n"
-            f"🐳 Docker: اجرا شد\n\n"
-            f"🔧 لاگ:\n<code>docker compose -f /opt/eazyflare/docker-compose.yml logs -f</code>"
+            f"🐳 Docker: در حال اجرا\n\n"
+            f"{_make_progress_bar(100)}\n"
+            f"⏱ {mins}:{secs:02d}\n\n"
+            f"🔧 لاگ:\n<code>docker compose -f /opt/eazyflare/docker-compose.yml logs -f</code>",
+            parse_mode="HTML"
         )
     else:
-        text = f"❌ <b>خطا:</b>\n<pre>{result['error'][:1500]}</pre>"
+        err_short = (err_out or "Unknown error")[:800]
+        await wait.edit_text(
+            f"❌ <b>خطا در نصب</b>\n\n"
+            f"{_make_progress_bar(current_pct)}\n"
+            f"آخرین مرحله: {current_msg}\n"
+            f"⏱ {mins}:{secs:02d}\n\n"
+            f"<pre>{err_short}</pre>",
+            parse_mode="HTML"
+        )
 
-    await wait.edit_text(text, parse_mode="HTML")
-
-    # Cleanup sensitive data
+    # Cleanup
     for k in ["dep_password", "dep_key_data", "dep_bottoken"]:
         ctx.user_data.pop(k, None)
-
     return ConversationHandler.END
 
 def _ssh_deploy(data):
+    """Legacy sync deploy (used by mini app handler)."""
     try:
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-        connect_args = {
-            "hostname": data["dep_host"],
-            "port": data["dep_port"],
-            "username": data["dep_user"],
-            "timeout": 15,
-        }
-
-        if data.get("dep_auth_method") == "pass":
-            connect_args["password"] = data["dep_password"]
-        else:
-            key_data = data.get("dep_key_data", "")
-            key_file = io.StringIO(key_data)
-            try:
-                pkey = paramiko.RSAKey.from_private_key(key_file)
-            except:
-                key_file.seek(0)
-                try:
-                    pkey = paramiko.Ed25519Key.from_private_key(key_file)
-                except:
-                    key_file.seek(0)
-                    pkey = paramiko.ECDSAKey.from_private_key(key_file)
-            connect_args["pkey"] = pkey
-
-        client.connect(**connect_args)
-
-        webapp_url = data.get("dep_webapp", "")
+        client = _ssh_connect(data)
         script = DEPLOY_SCRIPT.format(
             bot_token=data["dep_bottoken"],
-            webapp_url=webapp_url,
+            webapp_url=data.get("dep_webapp", ""),
         )
-
-        stdin, stdout, stderr = client.exec_command("bash -s", timeout=120)
+        stdin, stdout, stderr = client.exec_command("bash -s", timeout=300)
         stdin.write(script)
         stdin.channel.shutdown_write()
         exit_code = stdout.channel.recv_exit_status()
         out = stdout.read().decode("utf-8", errors="replace")
         err = stderr.read().decode("utf-8", errors="replace")
         client.close()
-
-        if exit_code == 0:
+        if exit_code == 0 and "DEPLOY_OK" in out:
             return {"success": True, "output": out}
         else:
             return {"success": False, "error": f"Exit code: {exit_code}\n{err}\n{out}"}
-
     except Exception as e:
         return {"success": False, "error": str(e)}
 
@@ -1792,11 +1876,12 @@ def main():
             BotCommand("disconnect", "قطع اتصال"),
             BotCommand("help", "راهنما"),
         ])
-        try:
-            await application.bot.set_chat_menu_button(
-                menu_button=MenuButtonWebApp(text="📊 Dashboard", web_app=WebAppInfo(url=WEBAPP_URL)))
-        except Exception as e:
-            logger.warning(f"Menu button: {e}")
+        if WEBAPP_URL:
+            try:
+                await application.bot.set_chat_menu_button(
+                    menu_button=MenuButtonWebApp(text="📊 Dashboard", web_app=WebAppInfo(url=WEBAPP_URL)))
+            except Exception as e:
+                logger.warning(f"Menu button: {e}")
 
     app.post_init = post_init
     logger.info("🚀 EazyFlare Bot started!")
