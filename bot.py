@@ -1660,7 +1660,7 @@ def main():
             CONNECT_EMAIL: [MessageHandler(filters.TEXT & ~filters.COMMAND, connect_email)],
             CONNECT_KEY: [MessageHandler(filters.TEXT & ~filters.COMMAND, connect_key)],
         },
-        fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
+        fallbacks=[CommandHandler("cancel", connect_cancel_msg), CommandHandler("start", cmd_start)],
         per_message=True,
         allow_reentry=True,
     )
@@ -1673,7 +1673,7 @@ def main():
             ADD_CONTENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_content)],
             ADD_PROXY: [CallbackQueryHandler(add_proxy, pattern="^px_")],
         },
-        fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
+        fallbacks=[CommandHandler("cancel", connect_cancel_msg), CommandHandler("start", cmd_start)],
         per_message=True,
         allow_reentry=True,
     )
@@ -1681,7 +1681,7 @@ def main():
     edit_conv = ConversationHandler(
         entry_points=[CallbackQueryHandler(edit_content_entry, pattern=r"^ec_")],
         states={EDIT_VALUE: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_content_value)]},
-        fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
+        fallbacks=[CommandHandler("cancel", connect_cancel_msg), CommandHandler("start", cmd_start)],
         per_message=True,
         allow_reentry=True,
     )
@@ -1697,7 +1697,7 @@ def main():
             PR_URL: [MessageHandler(filters.TEXT & ~filters.COMMAND, pr_add_url)],
             PR_ACTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, pr_add_action)],
         },
-        fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
+        fallbacks=[CommandHandler("cancel", connect_cancel_msg), CommandHandler("start", cmd_start)],
         per_message=True,
         allow_reentry=True,
     )
@@ -1712,7 +1712,7 @@ def main():
                 MessageHandler(filters.TEXT & ~filters.COMMAND, wk_edit_code),
             ],
         },
-        fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
+        fallbacks=[CommandHandler("cancel", connect_cancel_msg), CommandHandler("start", cmd_start)],
         per_message=True,
         allow_reentry=True,
     )
@@ -1737,7 +1737,7 @@ def main():
             DEP_BOTTOKEN: [MessageHandler(filters.TEXT & ~filters.COMMAND, deploy_bottoken)],
             DEP_WEBAPP: [MessageHandler(filters.TEXT & ~filters.COMMAND, deploy_webapp)],
         },
-        fallbacks=[CommandHandler("cancel", deploy_cancel)],
+        fallbacks=[CommandHandler("cancel", deploy_cancel), CommandHandler("start", cmd_start)],
         per_message=True,
         allow_reentry=True,
     )
@@ -1747,7 +1747,7 @@ def main():
     broadcast_conv = ConversationHandler(
         entry_points=[CommandHandler("broadcast", broadcast_start)],
         states={BROADCAST_MSG: [MessageHandler(filters.ALL & ~filters.COMMAND, broadcast_send)]},
-        fallbacks=[CommandHandler("cancel", broadcast_cancel)],
+        fallbacks=[CommandHandler("cancel", broadcast_cancel), CommandHandler("start", cmd_start)],
     )
     app.add_handler(broadcast_conv)
 
