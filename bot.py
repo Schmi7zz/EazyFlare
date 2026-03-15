@@ -1533,107 +1533,26 @@ async def deploy_webapp(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     host = ctx.user_data["dep_host"]
     port = ctx.user_data["dep_port"]
-    import time, queue, threading
-    start_time = time.time()
 
-    def _elapsed():
-        e = int(time.time() - start_time)
-        return f"{e//60}:{e%60:02d}"
+    wait = await update.message.reply_text(
+        f"⏳ <b>در حال نصب...</b>\n🖥 سرور: <code>{host}:{port}</code>",
+        parse_mode="HTML"
+    )
 
-    def _progress_text(pct, msg):
-        return (
-            f"🚀 <b>نصب EazyFlare</b>\n\n"
-            f"🖥 سرور: <code>{host}:{port}</code>\n\n"
-            f"{_make_progress_bar(pct)}\n"
-            f"{msg}\n"
-            f"⏱ {_elapsed()}"
-        )
+    result = await asyncio.get_event_loop().run_in_executor(None, _ssh_deploy, ctx.user_data)
 
-    wait = await update.message.reply_text(_progress_text(0, "🔌 اتصال به سرور..."), parse_mode="HTML")
-
-    # Connect
-    try:
-        client = await asyncio.get_event_loop().run_in_executor(None, _ssh_connect, ctx.user_data)
-    except Exception as e:
-        await wait.edit_text(f"❌ <b>خطای اتصال SSH</b>\n\n<code>{e}</code>\n⏱ {_elapsed()}", parse_mode="HTML")
-        for k in ["dep_password", "dep_key_data", "dep_bottoken"]:
-            ctx.user_data.pop(k, None)
-        return ConversationHandler.END
-
-    await wait.edit_text(_progress_text(10, "🔌 اتصال SSH برقرار شد"), parse_mode="HTML")
-
-    # Execute script
-    script = DEPLOY_SCRIPT.format(bot_token=ctx.user_data["dep_bottoken"], webapp_url=webapp)
-    stdin, stdout, stderr = client.exec_command("bash -s", timeout=300, get_pty=True)
-    stdin.write(script)
-    stdin.channel.shutdown_write()
-
-    # Read lines in background thread, push to queue
-    q = queue.Queue()
-    def _reader():
-        try:
-            while True:
-                line = stdout.readline(4096)
-                if not line:
-                    break
-                q.put(line.strip())
-        except:
-            pass
-        q.put(None)  # sentinel
-
-    threading.Thread(target=_reader, daemon=True).start()
-
-    step_map = {s[0]: (s[1], s[2]) for s in DEPLOY_STEPS}
-    current_pct, current_msg = 10, "🔌 اتصال SSH برقرار شد"
-    last_pct = 10
-
-    # Poll queue and update message
-    while True:
-        try:
-            line = q.get(timeout=0.5)
-        except queue.Empty:
-            continue
-        if line is None:
-            break
-        if line in step_map:
-            current_pct, current_msg = step_map[line]
-            if current_pct != last_pct:
-                last_pct = current_pct
-                try:
-                    await wait.edit_text(_progress_text(current_pct, current_msg), parse_mode="HTML")
-                except:
-                    pass
-                await asyncio.sleep(0.3)
-
-    exit_code = stdout.channel.recv_exit_status()
-    err_out = ""
-    try:
-        err_out = stderr.read().decode("utf-8", errors="replace")
-    except:
-        pass
-    client.close()
-
-    if exit_code == 0 and current_pct >= 90:
+    if result["success"]:
         await wait.edit_text(
             f"✅ <b>نصب موفق!</b>\n\n"
             f"🖥 سرور: <code>{host}</code>\n"
             f"📁 مسیر: <code>/opt/eazyflare</code>\n"
             f"🐳 Docker: در حال اجرا\n\n"
-            f"{_make_progress_bar(100)}\n"
-            f"⏱ {_elapsed()}\n\n"
             f"🔧 لاگ:\n<code>docker compose -f /opt/eazyflare/docker-compose.yml logs -f</code>",
             parse_mode="HTML"
         )
     else:
-        err_short = (err_out or "Unknown error")[:800]
-        await wait.edit_text(
-            f"❌ <b>خطا در نصب</b>\n\n"
-            f"{_make_progress_bar(current_pct)}\n"
-            f"آخرین مرحله: {current_msg}\n"
-            f"⏱ {_elapsed()}\n\n"
-            f"<pre>{err_short}</pre>",
-            parse_mode="HTML"
-        )
+        err = result["error"][:1200]
+        await wait.edit_text(f"❌ <b>خطا:</b>\n<pre>{err}</pre>", parse_mode="HTML")
 
     for k in ["dep_password", "dep_key_data", "dep_bottoken"]:
         ctx.user_data.pop(k, None)
@@ -1742,7 +1661,7 @@ def main():
             CONNECT_KEY: [MessageHandler(filters.TEXT & ~filters.COMMAND, connect_key)],
         },
         fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
-        per_message=False,
+        per_message=True,
         allow_reentry=True,
     )
 
@@ -1755,7 +1674,7 @@ def main():
             ADD_PROXY: [CallbackQueryHandler(add_proxy, pattern="^px_")],
         },
         fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
-        per_message=False,
+        per_message=True,
         allow_reentry=True,
     )
 
@@ -1763,7 +1682,7 @@ def main():
         entry_points=[CallbackQueryHandler(edit_content_entry, pattern=r"^ec_")],
         states={EDIT_VALUE: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_content_value)]},
         fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
-        per_message=False,
+        per_message=True,
         allow_reentry=True,
     )
 
@@ -1779,7 +1698,7 @@ def main():
             PR_ACTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, pr_add_action)],
         },
         fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
-        per_message=False,
+        per_message=True,
         allow_reentry=True,
     )
     app.add_handler(pr_conv)
@@ -1794,7 +1713,7 @@ def main():
             ],
         },
         fallbacks=[CommandHandler("cancel", connect_cancel_msg)],
-        per_message=False,
+        per_message=True,
         allow_reentry=True,
     )
     app.add_handler(wk_conv)
@@ -1819,7 +1738,7 @@ def main():
             DEP_WEBAPP: [MessageHandler(filters.TEXT & ~filters.COMMAND, deploy_webapp)],
         },
         fallbacks=[CommandHandler("cancel", deploy_cancel)],
-        per_message=False,
+        per_message=True,
         allow_reentry=True,
     )
     app.add_handler(deploy_conv)
