@@ -270,4 +270,4 @@ python3 bot.py
 
 ---
 
-Made with ♡ by [Schmitz](https://t.me/SchmitzWS)
+Made with ♡ by Schmitz
